@@ -25,7 +25,7 @@ public class Film {
     @NotNull(groups = {Update.class})
     private Long id;
     @NotNull(groups = {Create.class, Update.class})
-    @NotBlank(message = "Поле не может быть пустым")
+    @NotBlank(message = "Поле не может быть пустым", groups = {Create.class, Update.class})
     private String name;
     @NotNull(groups = {Create.class, Update.class})
     @NotBlank(groups = {Create.class, Update.class})

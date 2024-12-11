@@ -32,7 +32,7 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public User create(@Validated(Create.class) @RequestBody User user) {
-        if (user.getName() == null || user.getName().isEmpty() && user.getLogin() != null) {
+        if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
         log.info("валидация пользователя при создании: {}", user);
