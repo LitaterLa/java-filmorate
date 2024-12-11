@@ -2,16 +2,15 @@ package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.validation.Create;
-import ru.yandex.practicum.filmorate.validation.PositiveDuration;
 import ru.yandex.practicum.filmorate.validation.ReleaseDate;
 import ru.yandex.practicum.filmorate.validation.Update;
 
-import java.time.Duration;
 import java.time.LocalDate;
 
 /**
@@ -35,11 +34,11 @@ public class Film {
     @ReleaseDate
     private LocalDate releaseDate;
     @NotNull(groups = {Create.class, Update.class})
-    @PositiveDuration
-    private Duration duration = Duration.parse("PT3M10S");
+    @Positive
+    private int duration;
 
 
-    public Film(String name, String description, LocalDate releaseDate, Duration duration) {
+    public Film(String name, String description, LocalDate releaseDate, int duration) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;

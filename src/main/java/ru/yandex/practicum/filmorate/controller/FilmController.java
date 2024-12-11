@@ -16,7 +16,6 @@ import ru.yandex.practicum.filmorate.storage.FilmRepository;
 import ru.yandex.practicum.filmorate.validation.Create;
 import ru.yandex.practicum.filmorate.validation.Update;
 
-import java.time.Duration;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -33,9 +32,6 @@ public class FilmController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film add(@Validated(Create.class) @RequestBody Film film) {
-        long durationInMinutes = film.getDuration().toMinutes();
-        Duration duration = Duration.ofSeconds(durationInMinutes);
-        film.setDuration(duration);
         log.info("начало валидации фильма при создании {}", film);
         film.setId(filmRepository.generateId());
         log.info("создание фильма ID {} ", film.getId());
