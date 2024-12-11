@@ -19,7 +19,7 @@ public class InMemoryStorage<T> {
         return storage.get(id);
     }
 
-    public Collection< T> getAll() {
+    public Collection<T> getAll() {
         return storage.values();
     }
 
