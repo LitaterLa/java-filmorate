@@ -36,7 +36,7 @@ public class Film {
     private LocalDate releaseDate;
     @NotNull(groups = {Create.class, Update.class})
     @PositiveDuration
-    private Duration duration;
+    private Duration duration = Duration.parse("PT3M10S");
 
 
     public Film(String name, String description, LocalDate releaseDate, Duration duration) {

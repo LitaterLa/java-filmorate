@@ -50,7 +50,7 @@ public class FilmTest {
                 "Valid",
                 "Valid",
                 LocalDate.of(1800, 12, 12),
-                Duration.ofMinutes(-60)
+                Duration.ofMinutes(60)
         );
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
@@ -63,7 +63,7 @@ public class FilmTest {
                 "Valid",
                 "SoooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooInvalid",
                 LocalDate.of(1800, 12, 12),
-                Duration.ofMinutes(-60)
+                Duration.ofMinutes(60)
         );
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);

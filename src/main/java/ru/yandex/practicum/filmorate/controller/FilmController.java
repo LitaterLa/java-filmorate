@@ -8,14 +8,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmRepository;
 import ru.yandex.practicum.filmorate.validation.Create;
 import ru.yandex.practicum.filmorate.validation.Update;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -30,13 +31,11 @@ public class FilmController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Film add(@Validated(Create.class) @RequestBody Film film) {
-        if (film.getName() == null || film.getName().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Название фильма не может быть пустым");
-        }
-        if (film.getDuration() == null || film.getDuration().isZero()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Продолжительность фильма должна быть больше нуля");
-        }
+        long durationInMinutes = film.getDuration().toMinutes();
+        Duration duration = Duration.ofSeconds(durationInMinutes);
+        film.setDuration(duration);
         log.info("начало валидации фильма при создании {}", film);
         film.setId(filmRepository.generateId());
         log.info("создание фильма ID {} ", film.getId());
