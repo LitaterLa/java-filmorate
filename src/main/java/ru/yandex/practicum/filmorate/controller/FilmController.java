@@ -32,6 +32,9 @@ public class FilmController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film add(@Validated(Create.class) @RequestBody Film film) {
+//        if (film.getName().isEmpty()) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "название фильма не может быть пустым");
+//        }
         log.info("начало валидации фильма при создании {}", film);
         film.setId(filmRepository.generateId());
         log.info("создание фильма ID {} ", film.getId());

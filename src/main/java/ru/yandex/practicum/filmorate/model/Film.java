@@ -28,13 +28,15 @@ public class Film {
     @NotBlank(message = "Поле не может быть пустым")
     private String name;
     @NotNull(groups = {Create.class, Update.class})
-    @Size(max = 200)
+    @NotBlank(groups = {Create.class, Update.class})
+    @Size(max = 200, groups = {Create.class, Update.class})
     private String description;
     @NotNull(groups = {Create.class, Update.class})
-    @ReleaseDate
+    @ReleaseDate(groups = {Create.class, Update.class})
     private LocalDate releaseDate;
+
     @NotNull(groups = {Create.class, Update.class})
-    @Positive
+    @Positive(groups = {Create.class, Update.class})
     private int duration;
 
 

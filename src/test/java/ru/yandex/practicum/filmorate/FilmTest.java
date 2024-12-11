@@ -6,6 +6,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.validation.Create;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -38,7 +39,7 @@ public class FilmTest {
                 -60
         );
 
-        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film, Create.class);
         assertFalse(violations.isEmpty());
     }
 
@@ -51,7 +52,7 @@ public class FilmTest {
                 60
         );
 
-        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film, Create.class);
         assertFalse(violations.isEmpty());
     }
 
@@ -59,12 +60,16 @@ public class FilmTest {
     public void testInvalidDescription() {
         Film film = new Film(
                 "Valid",
-                "SoooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooInvalid",
+                "Sooooooooooooooooooooooooooooooooooooooooooooooooo-" +
+                        "oooooooooooooooooooooooooooooooooooooooooooooooooooooo-" +
+                        "oooooooooooooooooooooooooooooooooooooooooooooooooooooo-" +
+                        "ooooooooooooooooooInvalid",
                 LocalDate.of(1800, 12, 12),
                 60
         );
 
-        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+
+        Set<ConstraintViolation<Film>> violations = validator.validate(film, Create.class);
         assertFalse(violations.isEmpty());
     }
 }

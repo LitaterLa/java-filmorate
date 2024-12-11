@@ -32,6 +32,9 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public User create(@Validated(Create.class) @RequestBody User user) {
+        if (user.getName() == null || user.getName().isEmpty() && user.getLogin() != null) {
+            user.setName(user.getLogin());
+        }
         log.info("валидация пользователя при создании: {}", user);
         user.setId(repository.generateId());
         log.info("добавление пользователя ID {}", user.getId());
@@ -40,7 +43,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User update(@Validated(Update.class)  @RequestBody User newUser) {
+    public User update(@Validated(Update.class) @RequestBody User newUser) {
         return Optional.ofNullable(repository.get(newUser.getId())).map(oldUser -> {
             log.info("валидация пользователья ID {} при обновлении", newUser.getId());
             oldUser.setLogin(newUser.getLogin());
