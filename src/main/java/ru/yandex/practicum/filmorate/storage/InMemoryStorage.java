@@ -9,7 +9,7 @@ import java.util.Map;
 @Component
 public class InMemoryStorage<T> {
     private final Map<Long, T> storage = new HashMap<>();
-    private long id = 10;
+    private long id = 1;
 
     public void save(Long id, T value) {
         storage.put(id, value);
@@ -28,7 +28,7 @@ public class InMemoryStorage<T> {
     }
 
     public long generateId() {
-        return ++id;
+        return id++;
     }
 
 }

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmRepository;
@@ -29,6 +31,12 @@ public class FilmController {
 
     @PostMapping
     public Film add(@Validated(Create.class) @RequestBody Film film) {
+        if (film.getName() == null || film.getName().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Название фильма не может быть пустым");
+        }
+        if (film.getDuration() == null || film.getDuration().isZero()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Продолжительность фильма должна быть больше нуля");
+        }
         log.info("начало валидации фильма при создании {}", film);
         film.setId(filmRepository.generateId());
         log.info("создание фильма ID {} ", film.getId());

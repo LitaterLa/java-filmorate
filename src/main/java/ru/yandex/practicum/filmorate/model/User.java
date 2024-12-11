@@ -30,8 +30,10 @@ public class User {
     @NotNull(groups = {Create.class, Update.class})
     @Pattern(regexp = "^\\S+$", message = "Логин не может содержать пробелы")
     private String login;
+    @NotNull(groups = {Create.class, Update.class})
     @NotBlank(message = "Имя не может быть пустым")
     private String name;
+    @NotNull(groups = {Create.class, Update.class})
     @PastOrPresent(message = "Неверная дата дня рождения")
     private LocalDate birthday;
 
