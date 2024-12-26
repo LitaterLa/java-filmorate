@@ -7,14 +7,12 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.validation.Create;
 import ru.yandex.practicum.filmorate.validation.Update;
 
 import java.time.LocalDate;
 
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
     @EqualsAndHashCode.Include
