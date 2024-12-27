@@ -14,7 +14,7 @@ import ru.yandex.practicum.filmorate.model.ErrorResponse;
 public class ErrorHandler {
     private static final Logger log = LoggerFactory.getLogger(ErrorHandler.class);
 
-    @ExceptionHandler
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
         log.warn("Ошибка: {}", e.getMessage());

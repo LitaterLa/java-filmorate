@@ -61,22 +61,23 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public void addFriend(@PathVariable @Positive Long id,
-                          @PathVariable @Positive Long friendId) {
-        userService.addFriend(id, friendId);
+    public Set<Long> addFriend(@PathVariable @Positive Long id,
+                               @PathVariable @Positive Long friendId) {
+        return userService.addFriend(id, friendId);
+
     }
 
 
     @DeleteMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public Set<User> deleteFriend(@PathVariable @Positive Long id,
+    public Set<Long> deleteFriend(@PathVariable @Positive Long id,
                                   @PathVariable @Positive Long friendId) {
         return userService.deleteFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
     @ResponseStatus(HttpStatus.OK)
-    public Set<User> getAllFriends(@PathVariable @Positive Long id) {
+    public Set<Long> getAllFriends(@PathVariable @Positive Long id) {
         log.info("получение всех друзей пользователя");
         return userService.getFriends(id);
     }

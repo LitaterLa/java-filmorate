@@ -22,20 +22,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addFriend(Long userId, Long friendId) {
+    public Set<Long> addFriend(Long userId, Long friendId) {
         final User user = getUserByIdInternal(userId);
         final User friend = getUserByIdInternal(friendId);
-        if (userRepository.getFriends(userId).contains(friend)) {
+        if (userRepository.getFriends(userId).contains(friendId)) {
             throw new ValidationException("Уже друг");
         }
         userRepository.addFriend(user, friend);
+        return userRepository.getFriends(userId);
     }
 
     @Override
-    public Set<User> deleteFriend(Long userId, Long friendId) {
+    public Set<Long> deleteFriend(Long userId, Long friendId) {
         final User user = getUserByIdInternal(userId);
         final User friend = getUserById(friendId);
-        if (!(userRepository.getFriends(userId).contains(friend))) {
+        if (!(userRepository.getFriends(userId).contains(friendId))) {
             throw new NotFoundException("Ошибка: друг не найден");
         }
         userRepository.deleteFriend(user, friend);
@@ -43,7 +44,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<User> getFriends(Long userId) {
+    public Set<Long> getFriends(Long userId) {
         return new HashSet<>(userRepository.getFriends(userId));
     }
 
