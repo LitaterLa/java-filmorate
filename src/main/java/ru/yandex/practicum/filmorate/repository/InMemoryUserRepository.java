@@ -57,12 +57,18 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public void addFriend(User user, User friend) {
+        if (users.get(user) == null || users.get(friend) == null) {
+            throw new NotFoundException("no one to add");
+        }
         userFriends.computeIfAbsent(user.getId(), id -> new HashSet<>()).add(friend.getId());
         userFriends.computeIfAbsent(friend.getId(), id -> new HashSet<>()).add(user.getId());
     }
 
     @Override
     public void deleteFriend(User user, User friend) {
+        if (userFriends.get(user.getId()) == null || userFriends.get(friend.getId()) == null) {
+            throw new NotFoundException("no one to delete");
+        }
         userFriends.computeIfAbsent(user.getId(), id -> new HashSet<>()).remove(friend.getId());
         userFriends.computeIfAbsent(friend.getId(), id -> new HashSet<>()).remove(user.getId());
     }

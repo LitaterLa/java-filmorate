@@ -26,6 +26,7 @@ import java.util.Set;
 @RequestMapping("/users")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class UserController {
     private final UserServiceImpl userService;
 
@@ -79,7 +80,6 @@ public class UserController {
         return userService.getFriends(id);
     }
 
-    //todo
     @GetMapping("/{id}/friends/common/{otherId}")
     @ResponseStatus(HttpStatus.OK)
     public Collection<User> getMutualFriends(@PathVariable @Positive Long id,
