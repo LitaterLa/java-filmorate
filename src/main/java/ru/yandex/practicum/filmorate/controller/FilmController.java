@@ -43,7 +43,13 @@ public class FilmController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> getAll() {
-        return filmService.getALl();
+        return filmService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Film getFilm(@PathVariable @Positive Long id) {
+        return filmService.getFilmById(id);
     }
 
     @PutMapping

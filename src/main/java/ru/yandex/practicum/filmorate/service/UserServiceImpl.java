@@ -16,6 +16,11 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
     private final InMemoryUserRepository userRepository;
 
+    public User save(User user) {
+        userRepository.save(user);
+        return user;
+    }
+
     @Override
     public void addFriend(Long userId, Long friendId) {
         final User user = getUserByIdInternal(userId);
@@ -45,11 +50,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long id) {
         User user = getUserByIdInternal(id);
-        return user;
-    }
-
-    public User save(User user) {
-        userRepository.save(user);
         return user;
     }
 
