@@ -66,6 +66,7 @@ public class UserController {
         userService.addFriend(id, friendId);
     }
 
+
     @DeleteMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
     public Set<User> deleteFriend(@PathVariable @Positive Long id,

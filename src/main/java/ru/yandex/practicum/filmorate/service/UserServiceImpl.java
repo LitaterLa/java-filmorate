@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void addFriend(Long userId, Long friendId) {
         final User user = getUserByIdInternal(userId);
-        final User friend = getUserById(friendId);
+        final User friend = getUserByIdInternal(friendId);
         if (userRepository.getFriends(userId).contains(friend)) {
             throw new ValidationException("Уже друг");
         }
