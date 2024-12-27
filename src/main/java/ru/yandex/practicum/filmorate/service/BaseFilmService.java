@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.repository.UserRepository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,12 +50,17 @@ public class BaseFilmService implements FilmService {
     public List<Film> findBestLiked(Integer count) {
         return filmStorage.getAll().stream()
                 .sorted((f1, f2) -> Integer.compare(
-                        filmStorage.getUsersLikes(f2.getId()).size(),
-                        filmStorage.getUsersLikes(f1.getId()).size()
+                        Optional.ofNullable(filmStorage.getUsersLikes(f2.getId()))
+                                .map(Set::size)
+                                .orElse(0),
+                        Optional.ofNullable(filmStorage.getUsersLikes(f1.getId()))
+                                .map(Set::size)
+                                .orElse(0)
                 ))
                 .limit(count)
                 .collect(Collectors.toList());
     }
+
 
     public Film getFilmById(Long filmId) {
         return filmStorage.get(filmId).orElseThrow(() ->

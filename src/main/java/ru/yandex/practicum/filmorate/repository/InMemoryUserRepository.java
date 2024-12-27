@@ -28,7 +28,7 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public Optional<User> get(Long id) {
-        return Optional.of(users.get(id));
+        return Optional.ofNullable(users.get(id));
     }
 
     public Collection<User> getAll() {
@@ -56,13 +56,12 @@ public class InMemoryUserRepository implements UserRepository {
 
 
     @Override
-    public Set<Long> addFriend(User user, User friend) {
+    public void addFriend(User user, User friend) {
         if (!users.containsKey(user.getId()) || !users.containsKey(friend.getId())) {
             throw new NotFoundException("no one to add");
         }
         userFriends.computeIfAbsent(user.getId(), id -> new HashSet<>()).add(friend.getId());
         userFriends.computeIfAbsent(friend.getId(), id -> new HashSet<>()).add(user.getId());
-        return userFriends.get(user.getId());
     }
 
     @Override
@@ -70,21 +69,29 @@ public class InMemoryUserRepository implements UserRepository {
         if (!users.containsKey(user.getId()) || !users.containsKey(friend.getId())) {
             throw new NotFoundException("no one to delete");
         }
-        userFriends.computeIfAbsent(user.getId(), id -> new HashSet<>()).remove(friend.getId());
-        userFriends.computeIfAbsent(friend.getId(), id -> new HashSet<>()).remove(user.getId());
+        Set<Long> userFriendsSet = userFriends.computeIfAbsent(user.getId(), id -> new HashSet<>());
+        if (!userFriendsSet.contains(friend.getId())) {
+            throw new NotFoundException("Ошибка: друг не найден");
+        }
+        userFriendsSet.remove(friend.getId());
+        Set<Long> friendFriendsSet = userFriends.computeIfAbsent(friend.getId(), id -> new HashSet<>());
+        friendFriendsSet.remove(user.getId());
+
+//        userFriends.computeIfAbsent(user.getId(), id -> new HashSet<>()).remove(friend.getId());
+//        userFriends.computeIfAbsent(friend.getId(), id -> new HashSet<>()).remove(user.getId());
     }
 
     @Override
-    public Set<Long> getFriends(Long userId) {
+    public Set<User> getFriends(Long userId) {
         Set<Long> friendIds = userFriends.getOrDefault(userId, Collections.emptySet());
-//        Set<User> friends = new HashSet<>();
-////        for (Long friendId : friendIds) {
-////            User friend = users.get(friendId);
-////            if (friend != null) {
-////                friends.add(friend);
-////            }
-//        }
-        return friendIds;
+        Set<User> friends = new HashSet<>();
+        for (Long friendId : friendIds) {
+            User friend = users.get(friendId);
+            if (friend != null) {
+                friends.add(friend);
+            }
+        }
+        return new HashSet<>(friends);
     }
 
     @Override

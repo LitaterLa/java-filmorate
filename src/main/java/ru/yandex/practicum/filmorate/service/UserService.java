@@ -5,11 +5,11 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.Set;
 
 public interface UserService {
-    Set<Long> addFriend(Long userId, Long friendId);
+    Set<User> addFriend(Long userId, Long friendId);
 
-    Set<Long> deleteFriend(Long userId, Long friendId);
+    Set<User> deleteFriend(Long userId, Long friendId);
 
-    Set<Long> getFriends(Long userId);
+    Set<User> getFriends(Long userId);
 
     User getUserById(Long id);
 }

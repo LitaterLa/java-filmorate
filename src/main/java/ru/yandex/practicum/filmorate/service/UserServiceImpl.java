@@ -22,9 +22,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<Long> addFriend(Long userId, Long friendId) {
-        final User user = getUserByIdInternal(userId);
-        final User friend = getUserByIdInternal(friendId);
+    public Set<User> addFriend(Long userId, Long friendId) {
+        final User user = getByIdOrThrow(userId);
+        final User friend = getByIdOrThrow(friendId);
         if (userRepository.getFriends(userId).contains(friendId)) {
             throw new ValidationException("Уже друг");
         }
@@ -33,8 +33,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<Long> deleteFriend(Long userId, Long friendId) {
-        final User user = getUserByIdInternal(userId);
+    public Set<User> deleteFriend(Long userId, Long friendId) {
+        final User user = getByIdOrThrow(userId);
         final User friend = getUserById(friendId);
         if (!(userRepository.getFriends(userId).contains(friendId))) {
             throw new NotFoundException("Ошибка: друг не найден");
@@ -44,13 +44,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<Long> getFriends(Long userId) {
+    public Set<User> getFriends(Long userId) {
         return new HashSet<>(userRepository.getFriends(userId));
     }
 
     @Override
     public User getUserById(Long id) {
-        User user = getUserByIdInternal(id);
+        User user = getByIdOrThrow(id);
         return user;
     }
 
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.getMutualFriends(id1, id2);
     }
 
-    private User getUserByIdInternal(Long id) {
+    private User getByIdOrThrow(Long id) {
         return userRepository.get(id).orElseThrow(() -> new NotFoundException(" не найден Пользователь ID=" + id));
     }
 }

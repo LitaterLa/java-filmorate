@@ -14,11 +14,11 @@ public interface UserRepository {
 
     Optional<User> get(Long id);
 
-    Set<Long> addFriend(User user, User friend);
+    void addFriend(User user, User friend);
 
     void deleteFriend(User user, User friend);
 
-    Set<Long> getFriends(Long userId);
+    Set<User> getFriends(Long userId);
 
     Set<User> getMutualFriends(Long id1, Long id2);
 }
