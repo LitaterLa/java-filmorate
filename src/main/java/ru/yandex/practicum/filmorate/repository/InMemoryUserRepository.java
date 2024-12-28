@@ -75,12 +75,14 @@ public class InMemoryUserRepository implements UserRepository {
 
         userFriends.get(user.getId()).remove(friend.getId());
 
-        Set<Long> userFriendsSet = userFriends.computeIfAbsent(user.getId(), id -> new HashSet<>());
+        Set<Long> userFriendsSet = userFriends.computeIfAbsent(user.getId(),
+                id -> new HashSet<>());
         if (!userFriendsSet.contains(friend.getId())) {
             throw new NotFoundException("Ошибка: друг не найден");
         }
         userFriendsSet.remove(friend.getId());
-        Set<Long> friendFriendsSet = userFriends.computeIfAbsent(friend.getId(), id -> new HashSet<>());
+        Set<Long> friendFriendsSet = userFriends.computeIfAbsent(friend.getId(),
+                id -> new HashSet<>());
         friendFriendsSet.remove(user.getId());
     }
 

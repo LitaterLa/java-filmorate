@@ -36,9 +36,6 @@ public class UserServiceImpl implements UserService {
     public Set<User> deleteFriend(Long userId, Long friendId) {
         final User user = getByIdOrThrow(userId);
         final User friend = getUserById(friendId);
-        if (!(userRepository.getFriends(userId).contains(friendId))) {
-            throw new NotFoundException("Ошибка: друг не найден");
-        }
         userRepository.deleteFriend(user, friend);
         return userRepository.getFriends(userId);
     }
