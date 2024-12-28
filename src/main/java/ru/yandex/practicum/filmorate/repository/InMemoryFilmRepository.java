@@ -45,12 +45,10 @@ public class InMemoryFilmRepository implements FilmRepository {
 
     @Override
     public void addLike(Film film, User user) {
-        if (film == null || user == null) {
-            throw new ValidationException("Data cannot be null");
-        }
-        if (films.get(film.getId()) == null || userRepository.get(user.getId()) == null) {
+        if (!films.containsKey(film.getId()) || userRepository.get(user.getId()) == null) {
             throw new NotFoundException("Film or user not found");
         }
+
         usersLikes.computeIfAbsent(film.getId(), id -> new HashSet<>()).add(user.getId());
     }
 
