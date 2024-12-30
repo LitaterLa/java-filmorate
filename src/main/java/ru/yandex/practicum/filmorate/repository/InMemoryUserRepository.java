@@ -57,29 +57,15 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public void addFriend(User user, User friend) {
-        if (!users.containsKey(user.getId()) || !users.containsKey(friend.getId())) {
-            throw new NotFoundException("no one to add");
-        }
         userFriends.computeIfAbsent(user.getId(), id -> new HashSet<>()).add(friend.getId());
         userFriends.computeIfAbsent(friend.getId(), id -> new HashSet<>()).add(user.getId());
     }
 
     @Override
     public void deleteFriend(User user, User friend) {
-        if (!users.containsKey(user.getId()) || !users.containsKey(friend.getId())) {
-            throw new NotFoundException("no one to delete");
-        }
-        if (userFriends.get(user.getId()) == null) {
-            throw new NotFoundException("Ошибка: друг не найден");
-        }
-
         userFriends.get(user.getId()).remove(friend.getId());
-
         Set<Long> userFriendsSet = userFriends.computeIfAbsent(user.getId(),
                 id -> new HashSet<>());
-        if (!userFriendsSet.contains(friend.getId())) {
-            throw new NotFoundException("Ошибка: друг не найден");
-        }
         userFriendsSet.remove(friend.getId());
         Set<Long> friendFriendsSet = userFriends.computeIfAbsent(friend.getId(),
                 id -> new HashSet<>());
@@ -88,9 +74,6 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public Set<User> getFriends(Long userId) {
-        if (users.get(userId) == null) {
-            throw new NotFoundException("User not found");
-        }
         Set<Long> friendIds = userFriends.getOrDefault(userId, Collections.emptySet());
         Set<User> friends = new HashSet<>();
         for (Long friendId : friendIds) {

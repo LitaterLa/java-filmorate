@@ -22,22 +22,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<User> addFriend(Long userId, Long friendId) {
+    public void addFriend(Long userId, Long friendId) {
         final User user = getByIdOrThrow(userId);
         final User friend = getByIdOrThrow(friendId);
         if (userRepository.getFriends(userId).contains(friendId)) {
             throw new ValidationException("Уже друг");
         }
         userRepository.addFriend(user, friend);
-        return userRepository.getFriends(userId);
     }
 
     @Override
-    public Set<User> deleteFriend(Long userId, Long friendId) {
+    public void deleteFriend(Long userId, Long friendId) {
         final User user = getByIdOrThrow(userId);
         final User friend = getUserById(friendId);
         userRepository.deleteFriend(user, friend);
-        return userRepository.getFriends(userId);
+        userRepository.getFriends(userId);
     }
 
     @Override

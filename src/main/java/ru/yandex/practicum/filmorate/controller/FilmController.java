@@ -22,7 +22,6 @@ import ru.yandex.practicum.filmorate.validation.Update;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/films")
@@ -49,7 +48,7 @@ public class FilmController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Film getFilm(@PathVariable @Positive Long id) {
-        return filmService.getFilmById(id);
+        return filmService.getFilmByIdOrThrow(id);
     }
 
     @PutMapping
@@ -61,9 +60,9 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public Set<Long> addLike(@PathVariable @Positive Long id,
-                             @PathVariable @Positive Long userId) {
-        return filmService.addLike(id, userId);
+    public void addLike(@PathVariable @Positive Long id,
+                        @PathVariable @Positive Long userId) {
+        filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")

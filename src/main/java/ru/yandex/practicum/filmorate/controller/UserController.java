@@ -63,8 +63,8 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public Set<User> addFriend(@PathVariable @Positive Long id,
                                @PathVariable @Positive Long friendId) {
-        return userService.addFriend(id, friendId);
-
+        userService.addFriend(id, friendId);
+        return userService.getFriends(id);
     }
 
 
@@ -72,7 +72,8 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public Set<User> deleteFriend(@PathVariable @Positive Long id,
                                   @PathVariable @Positive Long friendId) {
-        return userService.deleteFriend(id, friendId);
+        userService.deleteFriend(id, friendId);
+        return userService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends")

@@ -11,9 +11,6 @@ import ru.yandex.practicum.filmorate.repository.UserRepository;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class BaseFilmService implements FilmService {
@@ -33,36 +30,24 @@ public class BaseFilmService implements FilmService {
     }
 
     @Override
-    public Set<Long> addLike(Long filmId, Long userId) {
-        Film film = getFilmById(filmId);
+    public void addLike(Long filmId, Long userId) {
+        Film film = getFilmByIdOrThrow(filmId);
         User user = getUserByIdOrThrow(userId);
         filmStorage.addLike(film, user);
-        return filmStorage.getUsersLikes(filmId);
     }
 
     @Override
     public void deleteLike(Long filmId, Long userId) {
-        Film film = getFilmById(filmId);
+        Film film = getFilmByIdOrThrow(filmId);
         User user = getUserByIdOrThrow(userId);
         filmStorage.removeLike(film, user);
     }
 
     public List<Film> findBestLiked(Integer count) {
-        return filmStorage.getAll().stream()
-                .sorted((f1, f2) -> Integer.compare(
-                        Optional.ofNullable(filmStorage.getUsersLikes(f2.getId()))
-                                .map(Set::size)
-                                .orElse(0),
-                        Optional.ofNullable(filmStorage.getUsersLikes(f1.getId()))
-                                .map(Set::size)
-                                .orElse(0)
-                ))
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.findBestLiked(count);
     }
 
-
-    public Film getFilmById(Long filmId) {
+    public Film getFilmByIdOrThrow(Long filmId) {
         return filmStorage.get(filmId).orElseThrow(() ->
                 new NotFoundException("not found film ID=" + filmId));
     }
