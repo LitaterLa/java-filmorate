@@ -68,9 +68,10 @@ public class InMemoryFilmRepository implements FilmRepository {
 
     @Override
     public List<Film> findBestLiked(Integer count) {
+        int maxCount = Math.min(count, films.size());
         return films.values().stream()
                 .sorted((f1, f2) -> Integer.compare(usersLikes.getOrDefault(f2.getId(), Set.of()).size(), usersLikes.getOrDefault(f1.getId(), Set.of()).size()))
-                .limit(count)
+                .limit(maxCount)
                 .collect(Collectors.toList());
 
     }
