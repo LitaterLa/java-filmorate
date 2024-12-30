@@ -22,7 +22,8 @@ public class BaseFilmService implements FilmService {
     }
 
     public Film update(Film newFilm) {
-        return filmStorage.update(newFilm);
+        Film film = filmStorage.get(newFilm.getId()).orElseThrow(() -> new NotFoundException("Film not found"));
+        return filmStorage.update(film);
     }
 
     public Collection<Film> getAll() {
@@ -32,14 +33,14 @@ public class BaseFilmService implements FilmService {
     @Override
     public void addLike(Long filmId, Long userId) {
         Film film = getFilmByIdOrThrow(filmId);
-        User user = getUserByIdOrThrow(userId);
+        User user = userStorage.get(userId).get();
         filmStorage.addLike(film, user);
     }
 
     @Override
     public void deleteLike(Long filmId, Long userId) {
         Film film = getFilmByIdOrThrow(filmId);
-        User user = getUserByIdOrThrow(userId);
+        User user = userStorage.get(userId).get();
         filmStorage.removeLike(film, user);
     }
 
@@ -52,8 +53,8 @@ public class BaseFilmService implements FilmService {
                 new NotFoundException("not found film ID=" + filmId));
     }
 
-    private User getUserByIdOrThrow(Long userId) {
-        return userStorage.get(userId).orElseThrow(() -> new NotFoundException("Not found user ID=" + userId));
-    }
+//    private User getUserByIdOrThrow(Long userId) {
+//        return userStorage.get(userId).orElseThrow(() -> new NotFoundException("Not found user ID=" + userId));
+//    }
 
 }

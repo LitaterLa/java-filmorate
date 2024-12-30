@@ -24,6 +24,7 @@ public class InMemoryUserRepository implements UserRepository {
             user.setId(generateId());
         }
         users.put(user.getId(), user);
+        userFriends.putIfAbsent(user.getId(), new HashSet<>());
     }
 
     @Override

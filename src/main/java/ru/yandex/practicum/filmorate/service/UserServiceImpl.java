@@ -41,7 +41,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Set<User> getFriends(Long userId) {
-        return new HashSet<>(userRepository.getFriends(userId));
+        User user = userRepository.get(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        return new HashSet<>(userRepository.getFriends(user.getId()));
     }
 
     @Override
