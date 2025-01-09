@@ -47,8 +47,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long id) {
-        User user = getByIdOrThrow(id);
-        return user;
+        return getByIdOrThrow(id);
     }
 
     public User update(User newUser) {

@@ -16,7 +16,7 @@ import java.util.Set;
 public class InMemoryUserRepository implements UserRepository {
     private final Map<Long, User> users = new HashMap<>();
     private final Map<Long, Set<Long>> userFriends = new HashMap<>();
-    private long id = 1;
+    private long idGlobal = 1;
 
     @Override
     public void save(User user) {
@@ -105,6 +105,6 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     private long generateId() {
-        return id++;
+        return idGlobal++;
     }
 }
