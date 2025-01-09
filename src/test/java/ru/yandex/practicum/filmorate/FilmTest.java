@@ -60,10 +60,7 @@ public class FilmTest {
     public void testInvalidDescription() {
         Film film = new Film(
                 "Valid",
-                "Sooooooooooooooooooooooooooooooooooooooooooooooooo-" +
-                        "oooooooooooooooooooooooooooooooooooooooooooooooooooooo-" +
-                        "oooooooooooooooooooooooooooooooooooooooooooooooooooooo-" +
-                        "ooooooooooooooooooInvalid",
+                "SoInvalid".repeat(23),
                 LocalDate.of(1800, 12, 12),
                 60
         );

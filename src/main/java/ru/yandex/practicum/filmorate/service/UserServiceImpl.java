@@ -1,0 +1,68 @@
+package ru.yandex.practicum.filmorate.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.repository.InMemoryUserRepository;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+    private final InMemoryUserRepository userRepository;
+
+    public User save(User user) {
+        userRepository.save(user);
+        return user;
+    }
+
+    @Override
+    public void addFriend(Long userId, Long friendId) {
+        final User user = getByIdOrThrow(userId);
+        final User friend = getByIdOrThrow(friendId);
+        if (userRepository.getFriends(userId).contains(friendId)) {
+            throw new ValidationException("Уже друг");
+        }
+        userRepository.addFriend(user, friend);
+    }
+
+    @Override
+    public void deleteFriend(Long userId, Long friendId) {
+        final User user = getByIdOrThrow(userId);
+        final User friend = getUserById(friendId);
+        userRepository.deleteFriend(user, friend);
+        userRepository.getFriends(userId);
+    }
+
+    @Override
+    public Set<User> getFriends(Long userId) {
+        User user = userRepository.get(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        return new HashSet<>(userRepository.getFriends(user.getId()));
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        return getByIdOrThrow(id);
+    }
+
+    public User update(User newUser) {
+        return userRepository.update(newUser);
+    }
+
+    public Collection<User> getAllUsers() {
+        return userRepository.getAll();
+    }
+
+    public Set<User> getMutualFriends(Long id1, Long id2) {
+        return userRepository.getMutualFriends(id1, id2);
+    }
+
+    private User getByIdOrThrow(Long id) {
+        return userRepository.get(id).orElseThrow(() -> new NotFoundException(" не найден Пользователь ID=" + id));
+    }
+}

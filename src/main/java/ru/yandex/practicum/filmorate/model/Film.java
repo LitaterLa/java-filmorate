@@ -39,7 +39,6 @@ public class Film {
     @Positive(groups = {Create.class, Update.class})
     private int duration;
 
-
     public Film(String name, String description, LocalDate releaseDate, int duration) {
         this.name = name;
         this.description = description;
