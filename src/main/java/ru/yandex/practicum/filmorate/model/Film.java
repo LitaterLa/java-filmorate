@@ -38,9 +38,6 @@ public class Film {
     @NotNull(groups = {Create.class, Update.class})
     @Positive(groups = {Create.class, Update.class})
     private int duration;
-    @NotNull(groups = {Create.class, Update.class})
-    private Genre genre;
-    private Rating rating;
 
     public Film(String name, String description, LocalDate releaseDate, int duration) {
         this.name = name;
