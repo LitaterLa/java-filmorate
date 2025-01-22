@@ -7,12 +7,18 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.validation.Create;
 import ru.yandex.practicum.filmorate.validation.Update;
 
 import java.time.LocalDate;
 
+/**
+ * User.
+ */
+
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
     @EqualsAndHashCode.Include
@@ -35,9 +41,9 @@ public class User {
     private LocalDate birthday;
 
     public User(String login, String name, String email, LocalDate birthday) {
+        this.email = email;
         this.login = login;
         this.name = name;
-        this.email = email;
         this.birthday = birthday;
     }
 }

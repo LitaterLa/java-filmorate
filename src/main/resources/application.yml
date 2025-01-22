@@ -1,4 +1,18 @@
 spring:
   main:
-    log-startup-info: false # ?? ??????? ????????? ??????????
-    banner-mode: off       # ?? ??????? ??????
+    log-startup-info: false # Отключить логирование информации при старте
+    banner-mode: off        # Отключить баннер Spring
+  sql:
+    init:
+      mode:
+        always          # Всегда инициализировать схему
+  datasource:
+    initialization-mode: always
+    url: jdbc:h2:file:./db/filmorate # Путь к файлу базы данных H2
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  h2:
+    console:
+      enabled: true          # Включить H2-консоль
+      path: /h2-console      # Задать путь для H2-консоли
