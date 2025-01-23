@@ -54,8 +54,6 @@ public class FilmDBRepositoryTest {
             new LinkedHashSet<>(Arrays.asList(action)), pgRating);
     private Film film3 = new Film("Thriller Movie", "A thriller", LocalDate.of(2024, 3, 10), 110,
             new LinkedHashSet<>(Arrays.asList(thriller)), pg13Rating);
-    private Film film4 = new Film("Sci-Fi Movie", "A sci-fi", LocalDate.of(2021, 12, 5), 150,
-            new LinkedHashSet<>(Arrays.asList(sciFi, action)), rRating);
 
     @Test
     public void testSave() {
@@ -109,12 +107,11 @@ public class FilmDBRepositoryTest {
         filmRepository.save(film1);
         filmRepository.save(film2);
         filmRepository.save(film3);
-        filmRepository.save(film4);
         Collection<Film> films = filmRepository.getAll();
-        assertThat(films).hasSize(4);
+        assertThat(films).hasSize(3);
 
         assertThat(films).extracting(Film::getName).containsExactlyInAnyOrder(
-                "Comedy Movie", "Action Movie", "Thriller Movie", "Sci-Fi Movie"
+                "Comedy Movie", "Action Movie", "Thriller Movie"
         );
     }
 

@@ -33,11 +33,11 @@ public class GenreDBRepositoryTest {
     @Test
     public void testGetAll() {
         List<Genre> all = genreRepository.getAll();
-        assertThat(all).hasSize(8);
+        assertThat(all).hasSize(6);
 
-        assertThat(all).extracting(Genre::getName).containsExactlyInAnyOrder("comedy", "action", "adventrure", "detective", "thriller", "sci-fi", "horror", "documentary");
+        assertThat(all).extracting(Genre::getName).containsExactlyInAnyOrder("Комедия", "Драма", "Боевик", "Мультфильм", "Триллер", "Документальный");
 
-        assertThat(all).extracting(Genre::getId).containsExactlyInAnyOrder(1, 2, 3, 4, 5, 6, 7, 8);
+        assertThat(all).extracting(Genre::getId).containsExactlyInAnyOrder(1, 2, 3, 4, 5, 6);
     }
 
 //    @Test
