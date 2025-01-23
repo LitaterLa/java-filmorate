@@ -69,10 +69,10 @@ public class JdbcFilmRepository implements FilmRepository {
                 .collect(Collectors.toMap(Mpaa::getId, rating -> rating));
 
         films.forEach(film -> {
-            film.setGenre(new LinkedHashSet<>(mappedGenres.getOrDefault(film.getId(), List.of())));
+            film.setGenres(new LinkedHashSet<>(mappedGenres.getOrDefault(film.getId(), List.of())));
 
-            Mpaa filmRating = ratingMap.get(film.getRating().getId());
-            film.setRating(filmRating != null ? filmRating : new Mpaa(0, "Unknown"));
+            Mpaa filmRating = ratingMap.get(film.getMpa().getId());
+            film.setMpa(filmRating != null ? filmRating : new Mpaa(0, "Unknown"));
         });
 
         return films;
@@ -103,13 +103,13 @@ public class JdbcFilmRepository implements FilmRepository {
                 .addValue("description", film.getDescription())
                 .addValue("releaseDate", film.getReleaseDate())
                 .addValue("duration", film.getDuration())
-                .addValue("ratingId", film.getRating().getId());
+                .addValue("ratingId", film.getMpa().getId());
 
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sqlQuery, params, keyHolder);
 
         film.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
-        addGenres(film.getId(), film.getGenre());
+        addGenres(film.getId(), film.getGenres());
 
         return film;
     }
@@ -143,13 +143,13 @@ public class JdbcFilmRepository implements FilmRepository {
                 .addValue("description", film.getDescription())
                 .addValue("releaseDate", film.getReleaseDate())
                 .addValue("duration", film.getDuration())
-                .addValue("ratingId", film.getRating().getId())
+                .addValue("ratingId", film.getMpa().getId())
                 .addValue("id", film.getId());
 
         jdbc.update(sqlQuery, params);
 
         removeGenreFilm(film.getId());
-        addGenres(film.getId(), film.getGenre());
+        addGenres(film.getId(), film.getGenres());
 
         return film;
     }
@@ -217,7 +217,7 @@ public class JdbcFilmRepository implements FilmRepository {
         Mpaa mpa = new Mpaa();
         mpa.setId(resultSet.getInt("rating_id"));
         mpa.setName(resultSet.getString("mpa_name"));
-        film.setRating(mpa);
+        film.setMpa(mpa);
 
         return film;
     }

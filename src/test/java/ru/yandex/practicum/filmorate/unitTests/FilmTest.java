@@ -33,7 +33,7 @@ public class FilmTest {
         film.setDescription("Valid description");
         film.setReleaseDate(LocalDate.of(2000, 12, 12));
         film.setDuration(60);
-        film.setRating(new Mpaa());
+        film.setMpa(new Mpaa());
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film, Create.class);
         assertTrue(violations.isEmpty());

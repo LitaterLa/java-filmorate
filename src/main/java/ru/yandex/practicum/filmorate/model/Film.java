@@ -45,19 +45,19 @@ public class Film {
     @NotNull(groups = {Create.class, Update.class})
     @Positive(groups = {Create.class, Update.class})
     private int duration;
-    private LinkedHashSet<Genre> genre;
+    private LinkedHashSet<Genre> genres;
     @NotNull(groups = {Create.class, Update.class})
     @ManyToOne
     @JoinColumn(name = "rating_id", referencedColumnName = "id")
-    private Mpaa rating;
+    private Mpaa mpa;
 
-    public Film(String name, String description, LocalDate releaseDate, int duration, LinkedHashSet<Genre> genre, Mpaa rating) {
+    public Film(String name, String description, LocalDate releaseDate, int duration, LinkedHashSet<Genre> genres, Mpaa mpa) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.genre = genre;
-        this.rating = rating;
+        this.genres = genres;
+        this.mpa = mpa;
 
     }
 

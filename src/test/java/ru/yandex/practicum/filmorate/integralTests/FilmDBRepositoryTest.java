@@ -83,7 +83,7 @@ public class FilmDBRepositoryTest {
         savedFilm.setName("NewName");
         savedFilm.setDescription("newSample@email.com");
         savedFilm.setDuration(100);
-        savedFilm.setRating(pgRating);
+        savedFilm.setMpa(pgRating);
         savedFilm.setReleaseDate(LocalDate.of(2000, 1, 1));
         filmRepository.update(savedFilm);
         assertThat(savedFilm).isNotNull()
@@ -182,7 +182,7 @@ public class FilmDBRepositoryTest {
         String query = "SELECT COUNT(*) FROM films f LEFT JOIN MPAA m ON f.rating_id = m.id WHERE f.id = :film_id AND m.id = :rating_id";
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("film_id", savedFilm1.getId())
-                .addValue("rating_id", savedFilm1.getRating().getId());
+                .addValue("rating_id", savedFilm1.getMpa().getId());
 
         int count = jdbc.queryForObject(query, params, Integer.class);
 
