@@ -38,47 +38,4 @@ public class JdbcGenreRepository implements GenreRepository {
         return jdbc.query(FIND_ALL_QUERY, mapper);
     }
 
-//    @Override
-//    public void setFilmGenre(List<Film> films) {
-//        String query = "INSERT INTO films_genres (film_id, genre_id) " +
-//                "VALUES (:film_id, :genre_id)";
-//        for (Film film : films) {
-//            for (Genre genre : film.getGenre()) {
-//                MapSqlParameterSource params = new MapSqlParameterSource();
-//                params.addValue("film_id", film.getId());
-//                params.addValue("genre_id", genre.getId());
-//                jdbc.update(query, params);
-//            }
-//        }
-//    }
-//
-//    @Override
-//    public List<Genre> loadFilmGenre(List<Film> films) {
-//        List<Long> ids = films.stream().map(Film::getId).collect(Collectors.toList());
-//        String query = "SELECT g.* FROM genres g " +
-//                "JOIN films_genres fg ON g.id = fg.genre_id " +
-//                "WHERE fg.film_id in (:ids)";
-//        MapSqlParameterSource params = new MapSqlParameterSource();
-//        params.addValue("ids", ids);
-//        return jdbc.query(query, params, mapper);
-//    }
-//
-//    @Override
-//    public List<Genre> findGenresByFilmIds(List<Long> filmIds) {
-//        String query = "SELECT g.* " +
-//                "FROM genres g JOIN film_genres fg ON g.id=fg.genre_id " +
-//                "WHERE fg.film_id IN (:filmIds);";
-//        MapSqlParameterSource params = new MapSqlParameterSource();
-//        params.addValue("filmIds", filmIds);
-//        return jdbc.query(query, params, mapper);
-//    }
-//
-//    @Override
-//    public List<Genre> getByIds(List<Long> genreIds) {
-//        String query = "SELECT * FROM genres WHERE id IN (:genreIds)";
-//        MapSqlParameterSource params = new MapSqlParameterSource();
-//        params.addValue("genreIds", genreIds);
-//        return jdbc.query(query, params, mapper);
-//    }
-
 }
