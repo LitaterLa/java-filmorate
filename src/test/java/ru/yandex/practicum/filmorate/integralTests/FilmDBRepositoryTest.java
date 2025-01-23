@@ -12,8 +12,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpaa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.JdbcFilmRepository;
-import ru.yandex.practicum.filmorate.repository.JdbcUserRepository;
+import ru.yandex.practicum.filmorate.repository.impl.JdbcFilmRepository;
+import ru.yandex.practicum.filmorate.repository.impl.JdbcUserRepository;
 import ru.yandex.practicum.filmorate.repository.mappers.FilmRowMapper;
 import ru.yandex.practicum.filmorate.repository.mappers.GenreRowMapper;
 import ru.yandex.practicum.filmorate.repository.mappers.MpaaRowMapper;
@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -171,6 +172,35 @@ public class FilmDBRepositoryTest {
         assertThat(bestLikedFilms).hasSize(2);
         assertThat(bestLikedFilms.get(0).getName()).isEqualTo("Comedy Movie");
         assertThat(bestLikedFilms.get(1).getName()).isEqualTo("Action Movie");
+    }
+
+    @Test
+    public void testRating() {
+
+        Film savedFilm1 = filmRepository.save(film1);
+
+        String query = "SELECT COUNT(*) FROM films f LEFT JOIN MPAA m ON f.rating_id = m.id WHERE f.id = :film_id AND m.id = :rating_id";
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("film_id", savedFilm1.getId())
+                .addValue("rating_id", savedFilm1.getRating().getId());
+
+        int count = jdbc.queryForObject(query, params, Integer.class);
+
+        assertThat(count).isEqualTo(1);
+    }
+
+    @Test
+    public void testLink() {
+        filmRepository.save(film1);
+        String query =
+                "SELECT fg.film_id, fg.genre_id " +
+                        "FROM film_genres fg " +
+                        "LEFT JOIN genres g ON fg.genre_id = g.id " +
+                        "WHERE g.id IS NULL";
+
+        List<Map<String, Object>> results = jdbc.queryForList(query, new MapSqlParameterSource());
+
+        assertThat(results).isEmpty();
     }
 
 

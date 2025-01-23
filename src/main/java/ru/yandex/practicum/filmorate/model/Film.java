@@ -1,9 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -18,6 +22,8 @@ import java.util.LinkedHashSet;
  * Film.
  */
 @Data
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 
@@ -41,6 +47,8 @@ public class Film {
     private int duration;
     private LinkedHashSet<Genre> genre;
     @NotNull(groups = {Create.class, Update.class})
+    @ManyToOne
+    @JoinColumn(name = "rating_id", referencedColumnName = "id")
     private Mpaa rating;
 
     public Film(String name, String description, LocalDate releaseDate, int duration, LinkedHashSet<Genre> genre, Mpaa rating) {
@@ -50,6 +58,7 @@ public class Film {
         this.duration = duration;
         this.genre = genre;
         this.rating = rating;
+
     }
 
 }

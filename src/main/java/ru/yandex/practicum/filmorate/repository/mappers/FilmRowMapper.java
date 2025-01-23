@@ -21,15 +21,24 @@ public class FilmRowMapper implements RowMapper<Film> {
 
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Film film = new Film();
-        film.setId(rs.getLong("id"));
-        film.setName(rs.getString("name"));
-        film.setDescription(rs.getString("description"));
-        film.setReleaseDate(rs.getDate("release_date").toLocalDate());
-        LinkedHashSet<Genre> genres = getFilmGenres(film.getId());
-        film.setGenre(genres);
-        Mpaa rating = getMpaaById(rs.getInt("rating_id"));
-        film.setRating(rating);
+        Film film = Film.builder()
+                .id(rs.getLong("id"))
+                .name(rs.getString("name"))
+                .description(rs.getString("description"))
+                .releaseDate(rs.getDate("release_date").toLocalDate())
+                .duration(rs.getInt("duration"))
+                .rating(Mpaa.builder()
+                        .id(rs.getInt("id"))
+                        .name(rs.getString("name"))
+                        .build())
+                .build();
+
+//        LinkedHashSet<Genre> genres = getFilmGenres(film.getId());
+//        film.setGenre(genres.isEmpty() ? new LinkedHashSet<>() : genres);
+//
+//        Mpaa rating = rs.getInt("rating_id") != 0 ? getMpaaById(rs.getInt("rating_id")) : null;
+//        film.setRating(rating != null ? rating : new Mpaa(0, "Unknown"));
+
         return film;
     }
 
@@ -44,7 +53,7 @@ public class FilmRowMapper implements RowMapper<Film> {
     private LinkedHashSet<Genre> getFilmGenres(Long filmId) {
         String select = "SELECT g.id, g.name FROM genres g " +
                 "JOIN film_genres fg ON fg.genre_id=g.id " +
-                " WHERE fg.film_id = :filmId";
+                "WHERE fg.film_id = :filmId";
 
         Map<String, Object> params = new HashMap<>();
         params.put("filmId", filmId);
@@ -52,5 +61,5 @@ public class FilmRowMapper implements RowMapper<Film> {
         LinkedHashSet<Genre> genres = new LinkedHashSet<>(jdbcTemplate.query(select, params, new GenreRowMapper()));
         return genres;
     }
-
 }
+

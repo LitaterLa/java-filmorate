@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.filmorate.model.Mpaa;
-import ru.yandex.practicum.filmorate.repository.JdbcMpaaRepository;
+import ru.yandex.practicum.filmorate.repository.impl.JdbcMpaaRepository;
 import ru.yandex.practicum.filmorate.repository.mappers.MpaaRowMapper;
 
 import java.util.List;

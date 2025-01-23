@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpaa;
-import ru.yandex.practicum.filmorate.repository.JdbcMpaaRepository;
+import ru.yandex.practicum.filmorate.repository.impl.JdbcMpaaRepository;
 
 import java.util.List;
 
