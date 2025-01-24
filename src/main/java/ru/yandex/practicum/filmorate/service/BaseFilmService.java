@@ -27,11 +27,15 @@ public class BaseFilmService implements FilmService {
     public Film save(Film film) {
         mpaaRepository.getById(film.getMpa().getId())
                 .orElseThrow(() -> new BadRequestException("Rating was not found"));
+
         LinkedHashSet<Genre> genres = film.getGenres();
-        genres.forEach(genre -> genreRepository.getById(genre.getId())
-                .orElseThrow(() -> new BadRequestException("Genre was not found")));
+        if (genres != null && !genres.isEmpty()) {
+            genres.forEach(genre -> genreRepository.getById(genre.getId())
+                    .orElseThrow(() -> new BadRequestException("Genre was not found")));
+        }
         return filmRepository.save(film);
     }
+
 
     public Film update(Film newFilm) {
         filmRepository.get(newFilm.getId()).orElseThrow(() -> new NotFoundException("Film not found"));

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.repository.mappers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -24,14 +25,12 @@ public class FilmRowMapper implements RowMapper<Film> {
         Film film = mapFilm(rs);
         Mpaa mpaa = getFilmMpaa(film.getId());
         film.setMpa(mpaa);
-        LinkedHashSet<Genre> genres = getFilmGenres(film.getId());
-        if (genres != null) {
-            film.setGenres(genres);
-        } else {
-            film.setGenres(new LinkedHashSet<>());
-        }
+
+        film.setGenres(getFilmGenres(film.getId()));
+
         return film;
     }
+
 
     private Mpaa getFilmMpaa(Long filmId) {
         String select = "SELECT m.id AS rating_id, m.name AS rating_name FROM MPAA m " +
@@ -49,15 +48,14 @@ public class FilmRowMapper implements RowMapper<Film> {
 
     private LinkedHashSet<Genre> getFilmGenres(Long filmId) {
         String select = "SELECT g.id, g.name FROM genres g " +
-                "JOIN film_genres fg ON fg.genre_id=g.id " +
+                "JOIN film_genres fg ON fg.genre_id = g.id " +
                 "WHERE fg.film_id = :filmId";
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("filmId", filmId);
+        MapSqlParameterSource params = new MapSqlParameterSource().addValue("filmId", filmId);
 
-        LinkedHashSet<Genre> genres = new LinkedHashSet<>(jdbcTemplate.query(select, params, new GenreRowMapper()));
-        return genres.isEmpty() ? new LinkedHashSet<>() : genres;
+        return new LinkedHashSet<>(jdbcTemplate.query(select, params, new GenreRowMapper()));
     }
+
 
     private Film mapFilm(ResultSet rs) throws SQLException {
         return Film.builder()

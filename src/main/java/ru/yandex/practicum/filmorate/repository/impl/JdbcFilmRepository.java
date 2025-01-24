@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.repository.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -28,6 +30,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class JdbcFilmRepository implements FilmRepository {
 
@@ -215,6 +218,17 @@ public class JdbcFilmRepository implements FilmRepository {
         }
         jdbc.batchUpdate(sqlQuery, batchValues.toArray(new Map[0]));
     }
+
+    private void validateGenres(LinkedHashSet<Genre> genres) {
+        List<Integer> allowedGenres = List.of(1, 2, 3, 4, 5, 6);
+
+        for (Genre genre : genres) {
+            if (!allowedGenres.contains(genre.getId())) {
+                throw new BadRequestException("Invalid genre ID: " + genre.getId());
+            }
+        }
+    }
+
 }
 
 
