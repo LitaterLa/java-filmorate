@@ -25,8 +25,11 @@ public class FilmRowMapper implements RowMapper<Film> {
         Mpaa mpaa = getFilmMpaa(film.getId());
         film.setMpa(mpaa);
         LinkedHashSet<Genre> genres = getFilmGenres(film.getId());
-        film.setGenres(genres);
-
+        if (genres != null) {
+            film.setGenres(genres);
+        } else {
+            film.setGenres(new LinkedHashSet<>());
+        }
         return film;
     }
 

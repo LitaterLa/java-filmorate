@@ -57,4 +57,12 @@ public class Film {
 
     }
 
+    public Film(String name, String description, LocalDate releaseDate, int duration, Mpaa mpa) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.mpa = mpa;
+        this.genres = new LinkedHashSet<>();
+    }
 }
