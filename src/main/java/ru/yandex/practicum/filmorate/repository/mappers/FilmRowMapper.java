@@ -30,15 +30,6 @@ public class FilmRowMapper implements RowMapper<Film> {
         return film;
     }
 
-
-    private Mpaa getMpaaById(int ratingId) {
-        String query = "SELECT id, name FROM MPAA WHERE id = :ratingId";
-        Map<String, Object> params = new HashMap<>();
-        params.put("ratingId", ratingId);
-
-        return jdbcTemplate.queryForObject(query, params, new MpaaRowMapper());
-    }
-
     private Mpaa getFilmMpaa(Long filmId) {
         String select = "SELECT m.id AS rating_id, m.name AS rating_name FROM MPAA m " +
                 "JOIN films f ON f.rating_id = m.id " +
@@ -62,7 +53,7 @@ public class FilmRowMapper implements RowMapper<Film> {
         params.put("filmId", filmId);
 
         LinkedHashSet<Genre> genres = new LinkedHashSet<>(jdbcTemplate.query(select, params, new GenreRowMapper()));
-        return genres;
+        return genres.isEmpty() ? new LinkedHashSet<>() : genres;
     }
 
     private Film mapFilm(ResultSet rs) throws SQLException {
