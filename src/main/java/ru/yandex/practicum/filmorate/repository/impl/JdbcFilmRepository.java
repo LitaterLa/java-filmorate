@@ -68,9 +68,14 @@ public class JdbcFilmRepository implements FilmRepository {
         films.forEach(film -> {
             film.setGenres(new LinkedHashSet<>(mappedGenres.getOrDefault(film.getId(), List.of())));
 
+            if (film.getGenres() == null) {
+                film.setGenres(new LinkedHashSet<>());
+            }
+
             Mpaa filmRating = ratingMap.get(film.getMpa().getId());
             film.setMpa(filmRating != null ? filmRating : new Mpaa(0, "Unknown"));
         });
+
 
         return films;
     }
