@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -25,10 +26,10 @@ public class BaseFilmService implements FilmService {
 
     public Film save(Film film) {
         mpaaRepository.getById(film.getMpa().getId())
-                .orElseThrow(() -> new NotFoundException("Rating was not found"));
+                .orElseThrow(() -> new BadRequestException("Rating was not found"));
         LinkedHashSet<Genre> genres = film.getGenres();
         genres.forEach(genre -> genreRepository.getById(genre.getId())
-                .orElseThrow(() -> new NotFoundException("Genre was not found")));
+                .orElseThrow(() -> new BadRequestException("Genre was not found")));
         return filmRepository.save(film);
     }
 

@@ -21,26 +21,9 @@ public class FilmRowMapper implements RowMapper<Film> {
 
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Film film = Film.builder()
-                .id(rs.getLong("id"))
-                .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .releaseDate(rs.getDate("release_date").toLocalDate())
-                .duration(rs.getInt("duration"))
-                .build();
-
-        String ratingName = rs.getString("name");
-        if (ratingName == null) {
-            ratingName = rs.getString("name");
-        }
-
-        Mpaa mpaa = Mpaa.builder()
-                .id(rs.getInt("id"))
-                .name(ratingName)
-                .build();
-
+        Film film = mapFilm(rs);
+        Mpaa mpaa = getFilmMpaa(film.getId());
         film.setMpa(mpaa);
-
         LinkedHashSet<Genre> genres = getFilmGenres(film.getId());
         film.setGenres(genres);
 
@@ -56,6 +39,20 @@ public class FilmRowMapper implements RowMapper<Film> {
         return jdbcTemplate.queryForObject(query, params, new MpaaRowMapper());
     }
 
+    private Mpaa getFilmMpaa(Long filmId) {
+        String select = "SELECT m.id AS rating_id, m.name AS rating_name FROM MPAA m " +
+                "JOIN films f ON f.rating_id = m.id " +
+                "WHERE f.id = :filmId";
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("filmId", filmId);
+
+        return jdbcTemplate.queryForObject(select, params, (rs, rowNum) ->
+                new Mpaa(rs.getInt("rating_id"), rs.getString("rating_name"))
+        );
+    }
+
+
     private LinkedHashSet<Genre> getFilmGenres(Long filmId) {
         String select = "SELECT g.id, g.name FROM genres g " +
                 "JOIN film_genres fg ON fg.genre_id=g.id " +
@@ -67,5 +64,16 @@ public class FilmRowMapper implements RowMapper<Film> {
         LinkedHashSet<Genre> genres = new LinkedHashSet<>(jdbcTemplate.query(select, params, new GenreRowMapper()));
         return genres;
     }
+
+    private Film mapFilm(ResultSet rs) throws SQLException {
+        return Film.builder()
+                .id(rs.getLong("id"))
+                .name(rs.getString("name"))
+                .description(rs.getString("description"))
+                .releaseDate(rs.getDate("release_date").toLocalDate())
+                .duration(rs.getInt("duration"))
+                .build();
+    }
+
 }
 
