@@ -27,20 +27,26 @@ public class FilmRowMapper implements RowMapper<Film> {
                 .description(rs.getString("description"))
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getInt("duration"))
-                .mpa(Mpaa.builder()
-                        .id(rs.getInt("id"))
-                        .name(rs.getString("name"))
-                        .build())
                 .build();
 
-//        LinkedHashSet<Genre> genres = getFilmGenres(film.getId());
-//        film.setGenre(genres.isEmpty() ? new LinkedHashSet<>() : genres);
-//
-//        Mpaa rating = rs.getInt("rating_id") != 0 ? getMpaaById(rs.getInt("rating_id")) : null;
-//        film.setRating(rating != null ? rating : new Mpaa(0, "Unknown"));
+        String ratingName = rs.getString("name");
+        if (ratingName == null) {
+            ratingName = rs.getString("name");
+        }
+
+        Mpaa mpaa = Mpaa.builder()
+                .id(rs.getInt("id"))
+                .name(ratingName)
+                .build();
+
+        film.setMpa(mpaa);
+
+        LinkedHashSet<Genre> genres = getFilmGenres(film.getId());
+        film.setGenres(genres);
 
         return film;
     }
+
 
     private Mpaa getMpaaById(int ratingId) {
         String query = "SELECT id, name FROM MPAA WHERE id = :ratingId";

@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -47,8 +45,6 @@ public class Film {
     private int duration;
     private LinkedHashSet<Genre> genres;
     @NotNull(groups = {Create.class, Update.class})
-    @ManyToOne
-    @JoinColumn(name = "rating_id", referencedColumnName = "id")
     private Mpaa mpa;
 
     public Film(String name, String description, LocalDate releaseDate, int duration, LinkedHashSet<Genre> genres, Mpaa mpa) {

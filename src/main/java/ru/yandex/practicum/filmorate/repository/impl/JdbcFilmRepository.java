@@ -45,7 +45,8 @@ public class JdbcFilmRepository implements FilmRepository {
         }
         List<Long> filmIds = films.stream().map(Film::getId).collect(Collectors.toList());
 
-        String genreQuery = "SELECT fg.film_id, g.id AS genre_id, g.name AS genre_name " + "FROM film_genres fg " + "JOIN genres g ON fg.genre_id = g.id " + "WHERE fg.film_id IN (:filmIds)";
+        String genreQuery = "SELECT fg.film_id, g.id AS genre_id, g.name AS genre_name "
+                + "FROM film_genres fg " + "JOIN genres g ON fg.genre_id = g.id " + "WHERE fg.film_id IN (:filmIds)";
         MapSqlParameterSource genresParams = new MapSqlParameterSource();
         genresParams.addValue("filmIds", filmIds);
         List<Map<String, Object>> genreResults = jdbc.queryForList(genreQuery, genresParams);
@@ -77,7 +78,8 @@ public class JdbcFilmRepository implements FilmRepository {
 
     @Override
     public Optional<Film> get(Long id) {
-        String query = "SELECT f.*, m.name mpa_name " + "FROM films f " + "INNER JOIN MPAA m ON m.id = f.rating_id " + "WHERE f.id = :id";
+        String query = "SELECT f.*, m.name mpa_name "
+                + "FROM films f " + "INNER JOIN MPAA m ON m.id = f.rating_id " + "WHERE f.id = :id";
         try {
             Film film = jdbc.queryForObject(query, new MapSqlParameterSource("id", id), mapper);
             return Optional.of(film);
@@ -88,9 +90,14 @@ public class JdbcFilmRepository implements FilmRepository {
 
     @Override
     public Film save(Film film) {
-        String sqlQuery = "INSERT INTO films (name, description, release_date, duration, rating_id) " + "VALUES (:name, :description, :releaseDate, :duration, :ratingId)";
+        String sqlQuery = "INSERT INTO films (name, description, release_date, duration, rating_id) "
+                + "VALUES (:name, :description, :releaseDate, :duration, :ratingId)";
 
-        MapSqlParameterSource params = new MapSqlParameterSource().addValue("name", film.getName()).addValue("description", film.getDescription()).addValue("releaseDate", film.getReleaseDate()).addValue("duration", film.getDuration()).addValue("ratingId", film.getMpa().getId());
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("name", film.getName()).addValue("description", film.getDescription())
+                .addValue("releaseDate", film.getReleaseDate())
+                .addValue("duration", film.getDuration())
+                .addValue("ratingId", film.getMpa().getId());
 
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sqlQuery, params, keyHolder);
@@ -137,7 +144,10 @@ public class JdbcFilmRepository implements FilmRepository {
 
     @Override
     public List<Film> findBestLiked(Integer count) {
-        String query = "SELECT f.*, COUNT(l.user_id) AS like_count " + "FROM films f " + "LEFT JOIN likes l ON f.id = l.film_id " + "GROUP BY f.id " + "ORDER BY like_count DESC " + "LIMIT :count";
+        String query = "SELECT f.*, COUNT(l.user_id) AS like_count "
+                + "FROM films f " + "LEFT JOIN likes l ON f.id = l.film_id "
+                + "GROUP BY f.id " + "ORDER BY like_count DESC "
+                + "LIMIT :count";
 
         return jdbc.query(query, new MapSqlParameterSource("count", count), mapper);
     }
@@ -167,8 +177,8 @@ public class JdbcFilmRepository implements FilmRepository {
         film.setDuration(resultSet.getInt("duration"));
 
         Mpaa mpa = new Mpaa();
-        mpa.setId(resultSet.getInt("rating_id"));
-        mpa.setName(resultSet.getString("mpa_name"));
+        mpa.setId(resultSet.getInt("id"));
+        mpa.setName(resultSet.getString("name"));
         film.setMpa(mpa);
 
         return film;
