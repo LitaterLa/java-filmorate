@@ -91,7 +91,6 @@ public class JdbcFilmRepository implements FilmRepository {
 
     @Override
     public Optional<Film> get(Long id) {
-        // Запрос для получения данных о фильме
         String query = "SELECT f.id AS film_id, f.name AS film_name, f.description AS film_description, " +
                 "f.release_date AS film_release_date, f.duration AS film_duration, f.rating_id AS film_rating_id, " +
                 "m.id AS rating_id, m.name AS rating_name " +
@@ -110,11 +109,13 @@ public class JdbcFilmRepository implements FilmRepository {
             String genreQuery = "SELECT g.id AS genre_id, g.name AS genre_name " +
                     "FROM genres g " +
                     "JOIN film_genres fg ON g.id = fg.genre_id " +
-                    "WHERE fg.film_id = :filmId";
+                    "WHERE fg.film_id = :filmId " +
+                    "GROUP BY fg.genre_id " +
+                    "ORDER BY fg.genre_id";
 
             List<Genre> genres = jdbc.query(genreQuery, new MapSqlParameterSource("filmId", id), genreMapper);
 
-            film.setGenres(new HashSet<>(genres));
+            film.setGenres(new LinkedHashSet<>(genres));
 
             return Optional.of(film);
 
