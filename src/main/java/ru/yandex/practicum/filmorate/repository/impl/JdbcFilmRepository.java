@@ -111,7 +111,7 @@ public class JdbcFilmRepository implements FilmRepository {
                     "JOIN film_genres fg ON g.id = fg.genre_id " +
                     "WHERE fg.film_id = :filmId " +
                     "GROUP BY fg.genre_id " +
-                    "ORDER BY fg.genre_id";
+                    "ORDER BY fg.genre_id DESC";
 
             List<Genre> genres = jdbc.query(genreQuery, new MapSqlParameterSource("filmId", id), genreMapper);
 
