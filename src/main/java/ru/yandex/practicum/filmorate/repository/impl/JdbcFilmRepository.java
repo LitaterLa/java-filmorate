@@ -111,7 +111,7 @@ public class JdbcFilmRepository implements FilmRepository {
                     "JOIN film_genres fg ON g.id = fg.genre_id " +
                     "WHERE fg.film_id = :filmId " +
                     "GROUP BY fg.genre_id " +
-                    "ORDER BY fg.genre_id DESC";
+                    "ORDER BY fg.genre_id";
 
             List<Genre> genres = jdbc.query(genreQuery, new MapSqlParameterSource("filmId", id), genreMapper);
 
@@ -244,7 +244,7 @@ public class JdbcFilmRepository implements FilmRepository {
         String sqlQuery = "INSERT INTO film_genres (film_id, genre_id) " +
                 "SELECT :filmId, id FROM genres WHERE id IN (:genreIds)";
 
-        Set<Integer> genreIds = new HashSet<>();
+        Set<Integer> genreIds = new LinkedHashSet<>();
         for (Genre genre : filmGenres) {
             genreIds.add(genre.getId());
         }
