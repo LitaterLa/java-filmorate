@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.repository.mappers.GenreRowMapper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Repository
@@ -18,8 +19,8 @@ public class JdbcGenreRepository implements GenreRepository {
     private final NamedParameterJdbcOperations jdbc;
     private final GenreRowMapper mapper;
 
-    private static final String FIND_ALL_QUERY = "SELECT * FROM genres";
-    private static final String FIND_BY_ID_QUERY = "SELECT * FROM genres WHERE id = :id";
+    private static final String FIND_ALL_QUERY = "SELECT id, name FROM genres";
+    private static final String FIND_BY_ID_QUERY = "SELECT id, name FROM genres WHERE id = :id";
 
     @Override
     public Optional<Genre> getById(long id) {
@@ -36,6 +37,11 @@ public class JdbcGenreRepository implements GenreRepository {
     @Override
     public List<Genre> getAll() {
         return jdbc.query(FIND_ALL_QUERY, mapper);
+    }
+
+    public List<Genre> getByIds(Set<Integer> genreIds) {
+        String sqlQuery = "SELECT id, name FROM genres WHERE id IN (:genreIds)";
+        return jdbc.query(sqlQuery, new MapSqlParameterSource("genreIds", genreIds), mapper);
     }
 
 }

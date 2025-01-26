@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.integralTests;
+package ru.yandex.practicum.filmorate.integral_tests;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;

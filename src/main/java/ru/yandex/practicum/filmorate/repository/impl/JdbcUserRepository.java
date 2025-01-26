@@ -23,8 +23,8 @@ public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcOperations jdbc;
     private final UserRowMapper mapper;
 
-    private static final String FIND_ALL_QUERY = "SELECT * FROM users";
-    private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id = :id";
+    private static final String FIND_ALL_QUERY = "SELECT id, login, name, email, birthday FROM users";
+    private static final String FIND_BY_ID_QUERY = "SELECT id, login, name, email, birthday FROM users WHERE id = :id";
     private static final String INSERT_QUERY = "INSERT INTO users(login, name, email, birthday)" +
             "VALUES (:login, :name, :email, :birthday)";
     private static final String UPDATE_QUERY = "UPDATE users SET name = :name, login = :login, email = :email, " +

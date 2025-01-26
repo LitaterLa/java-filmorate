@@ -33,28 +33,6 @@ public class GenreController {
         log.info("получение жанра по ид={}", id);
         return genreService.getGenreById(id);
     }
-
-//    @PostMapping("/films")
-//    public void setFilmGenres(@RequestBody List<Film> films) {
-//        genreService.setFilmGenres(films);
-//    }
-//
-//    @GetMapping("/films")
-//    public List<Genre> loadFilmGenres(@RequestBody List<Film> films) {
-//        return genreService.loadFilmGenres(films);
-//    }
-//
-//    @GetMapping("/films/ids")
-//    public List<Genre> getGenresByFilmIds(@RequestParam List<Long> filmIds) {
-//        return genreService.getGenresByFilmIds(filmIds);
-//    }
-//
-//    @GetMapping("/ids")
-//    public List<Genre> getGenresByIds(@RequestParam List<Long> genreIds) {
-//        return genreService.getGenresByIds(genreIds);
-//    }
-
-
 }
 
 

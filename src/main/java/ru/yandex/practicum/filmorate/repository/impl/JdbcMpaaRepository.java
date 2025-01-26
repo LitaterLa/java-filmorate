@@ -26,7 +26,7 @@ public class JdbcMpaaRepository implements MpaaRepository {
 
     @Override
     public Optional<Mpaa> getById(int id) {
-        String query = "SELECT * FROM MPAA where id = :rating_id";
+        String query = "SELECT id, name FROM MPAA where id = :rating_id";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("rating_id", id);
         try {

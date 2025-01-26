@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -13,8 +12,10 @@ import ru.yandex.practicum.filmorate.repository.impl.JdbcMpaaRepository;
 import ru.yandex.practicum.filmorate.repository.impl.JdbcUserRepository;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,19 +27,31 @@ public class BaseFilmService implements FilmService {
 
     public Film save(Film film) {
         mpaaRepository.getById(film.getMpa().getId())
-                .orElseThrow(() -> new BadRequestException("Rating was not found"));
+                .orElseThrow(() -> new NotFoundException("Rating was not found"));
 
-        LinkedHashSet<Genre> genres = film.getGenres();
+        Set<Genre> genres = film.getGenres();
         if (genres != null && !genres.isEmpty()) {
-            genres.forEach(genre -> genreRepository.getById(genre.getId())
-                    .orElseThrow(() -> new BadRequestException("Genre was not found")));
+            Set<Integer> genreIds = genres.stream()
+                    .map(Genre::getId)
+                    .collect(Collectors.toSet());
+
+            List<Genre> genresAlready = genreRepository.getByIds(genreIds);
+
+            Map<Integer, Genre> genreMap = genresAlready.stream()
+                    .collect(Collectors.toMap(Genre::getId, genre -> genre));
+
+            genres.forEach(genre -> {
+                if (!genreMap.containsKey(genre.getId())) {
+                    throw new NotFoundException("Жанр " + genre.getId() + " не найден");
+                }
+            });
         }
+
         return filmRepository.save(film);
     }
 
-
     public Film update(Film newFilm) {
-        filmRepository.get(newFilm.getId()).orElseThrow(() -> new NotFoundException("Film not found"));
+        filmRepository.get(newFilm.getId()).orElseThrow(() -> new NotFoundException("Фильм не найден"));
         return filmRepository.update(newFilm);
     }
 

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.unitTests;
+package ru.yandex.practicum.filmorate.unit_tests;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -23,23 +23,4 @@ public class GenreService implements BaseGenreService {
         return genreRepository.getAll();
     }
 
-//    @Override
-//    public void setFilmGenres(List<Film> films) {
-//        genreRepository.setFilmGenre(films);
-//    }
-//
-//    @Override
-//    public List<Genre> loadFilmGenres(List<Film> films) {
-//        return genreRepository.loadFilmGenre(films);
-//    }
-//
-//    @Override
-//    public List<Genre> getGenresByFilmIds(List<Long> filmIds) {
-//        return genreRepository.findGenresByFilmIds(filmIds);
-//    }
-//
-//    @Override
-//    public List<Genre> getGenresByIds(List<Long> genreIds) {
-//        return genreRepository.getByIds(genreIds);
-//    }
 }

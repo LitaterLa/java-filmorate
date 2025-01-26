@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.validation.Update;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Film.
@@ -43,11 +44,11 @@ public class Film {
     @NotNull(groups = {Create.class, Update.class})
     @Positive(groups = {Create.class, Update.class})
     private int duration;
-    private LinkedHashSet<Genre> genres;
+    private Set<Genre> genres;
     @NotNull(groups = {Create.class, Update.class})
     private Mpaa mpa;
 
-    public Film(String name, String description, LocalDate releaseDate, int duration, LinkedHashSet<Genre> genres, Mpaa mpa) {
+    public Film(String name, String description, LocalDate releaseDate, int duration, Set<Genre> genres, Mpaa mpa) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;

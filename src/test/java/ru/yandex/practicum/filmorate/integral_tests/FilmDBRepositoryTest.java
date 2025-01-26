@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.integralTests;
+package ru.yandex.practicum.filmorate.integral_tests;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,6 @@ import ru.yandex.practicum.filmorate.repository.mappers.MpaaRowMapper;
 import ru.yandex.practicum.filmorate.repository.mappers.UserRowMapper;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -38,22 +37,20 @@ public class FilmDBRepositoryTest {
     private final JdbcUserRepository userRepository;
     private final NamedParameterJdbcOperations jdbc;
 
-    private Mpaa gRating = new Mpaa(1, "G");
-    private Mpaa pgRating = new Mpaa(2, "PG");
-    private Mpaa pg13Rating = new Mpaa(3, "PG-13");
-    private Mpaa rRating = new Mpaa(4, "R");
+    private final Mpaa gRating = new Mpaa(1, "G");
+    private final Mpaa pgRating = new Mpaa(2, "PG");
+    private final Mpaa pg13Rating = new Mpaa(3, "PG-13");
 
-    private Genre comedy = new Genre(1, "comedia");
-    private Genre action = new Genre(2, "azione");
-    private Genre thriller = new Genre(5, "thriller");
-    private Genre sciFi = new Genre(8, "scientifico");
+    private final Genre comedy = new Genre(1, "comedia");
+    private final Genre action = new Genre(2, "azione");
+    private final Genre thriller = new Genre(5, "thriller");
 
-    private Film film1 = new Film("Comedy Movie", "A comedy", LocalDate.of(2023, 6, 15), 90,
-            new LinkedHashSet<>(Arrays.asList(comedy)), gRating);
-    private Film film2 = new Film("Action Movie", "An action", LocalDate.of(2022, 8, 22), 120,
-            new LinkedHashSet<>(Arrays.asList(action)), pgRating);
-    private Film film3 = new Film("Thriller Movie", "A thriller", LocalDate.of(2024, 3, 10), 110,
-            new LinkedHashSet<>(Arrays.asList(thriller)), pg13Rating);
+    private final Film film1 = new Film("Comedy Movie", "A comedy", LocalDate.of(2023, 6, 15), 90,
+            new LinkedHashSet<>(List.of(comedy)), gRating);
+    private final Film film2 = new Film("Action Movie", "An action", LocalDate.of(2022, 8, 22), 120,
+            new LinkedHashSet<>(List.of(action)), pgRating);
+    private final Film film3 = new Film("Thriller Movie", "A thriller", LocalDate.of(2024, 3, 10), 110,
+            new LinkedHashSet<>(List.of(thriller)), pg13Rating);
 
     @Test
     public void testSave() {
@@ -68,11 +65,10 @@ public class FilmDBRepositoryTest {
 
     @Test
     public void testDelete() {
-        Film saved1 = filmRepository.save(film1);
         Film saved2 = filmRepository.save(film2);
-        assertThat(filmRepository.getAll()).hasSize(2);
+        assertThat(filmRepository.getAll()).hasSize(1);
         filmRepository.delete(saved2.getId());
-        assertThat(filmRepository.getAll()).hasSize(1).doesNotContain(saved2);
+        assertThat(filmRepository.getAll()).hasSize(0).doesNotContain(saved2);
     }
 
     @Test

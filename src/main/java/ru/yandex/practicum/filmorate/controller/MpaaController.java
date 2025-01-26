@@ -23,7 +23,6 @@ public class MpaaController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<Mpaa> getMpaa() {
-        List<Mpaa> rating = service.getMpaa();
         log.info("получение всех рейтингов");
         return service.getMpaa();
     }
@@ -31,7 +30,6 @@ public class MpaaController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Mpaa getById(@PathVariable int id) {
-        Mpaa mpaa = service.getById(id);
         log.info("получение рейтига по ид={}", id);
         return service.getById(id);
     }
