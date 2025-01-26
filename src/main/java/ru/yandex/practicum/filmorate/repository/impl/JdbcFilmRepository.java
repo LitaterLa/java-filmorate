@@ -18,7 +18,6 @@ import ru.yandex.practicum.filmorate.repository.mappers.GenreRowMapper;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +58,8 @@ public class JdbcFilmRepository implements FilmRepository {
         String genreQuery = "SELECT fg.film_id AS film_id, g.id AS genre_id, g.name AS genre_name " +
                 "FROM film_genres fg " +
                 "JOIN genres g ON fg.genre_id = g.id " +
-                "WHERE fg.film_id IN (:filmIds)";
+                "WHERE fg.film_id IN (:filmIds) " +
+                "ORDER BY fg.film_id, g.id";
         MapSqlParameterSource genresParams = new MapSqlParameterSource();
         genresParams.addValue("filmIds", filmIds);
         List<Map<String, Object>> genreResults = jdbc.queryForList(genreQuery, genresParams);
@@ -70,11 +70,11 @@ public class JdbcFilmRepository implements FilmRepository {
             int genreId = (int) row.get("genre_id");
             String genreName = (String) row.get("genre_name");
 
-            mappedGenres.computeIfAbsent(filmId, k -> new HashSet<>()).add(new Genre(genreId, genreName));
+            mappedGenres.computeIfAbsent(filmId, k -> new LinkedHashSet<>()).add(new Genre(genreId, genreName));
         }
 
         films.forEach(film -> {
-            film.setGenres(new HashSet<>(mappedGenres.getOrDefault(film.getId(), Set.of())));
+            film.setGenres(new LinkedHashSet<>(mappedGenres.getOrDefault(film.getId(), Set.of())));
 
             if (film.getGenres() == null) {
                 film.setGenres(new LinkedHashSet<>());
@@ -242,7 +242,7 @@ public class JdbcFilmRepository implements FilmRepository {
         }
 
         String sqlQuery = "INSERT INTO film_genres (film_id, genre_id) " +
-                "SELECT :filmId, id FROM genres WHERE id IN (:genreIds)";
+                "SELECT :filmId, id FROM genres WHERE id IN (:genreIds)  ORDER BY id";
 
         Set<Integer> genreIds = new LinkedHashSet<>();
         for (Genre genre : filmGenres) {
