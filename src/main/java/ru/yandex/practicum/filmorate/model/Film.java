@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -12,11 +14,14 @@ import ru.yandex.practicum.filmorate.validation.ReleaseDate;
 import ru.yandex.practicum.filmorate.validation.Update;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 
 /**
  * Film.
  */
 @Data
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 
@@ -38,11 +43,26 @@ public class Film {
     @NotNull(groups = {Create.class, Update.class})
     @Positive(groups = {Create.class, Update.class})
     private int duration;
+    private LinkedHashSet<Genre> genres;
+    @NotNull(groups = {Create.class, Update.class})
+    private Mpaa mpa;
 
-    public Film(String name, String description, LocalDate releaseDate, int duration) {
+    public Film(String name, String description, LocalDate releaseDate, int duration, LinkedHashSet<Genre> genres, Mpaa mpa) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        this.genres = genres;
+        this.mpa = mpa;
+
+    }
+
+    public Film(String name, String description, LocalDate releaseDate, int duration, Mpaa mpa) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.mpa = mpa;
+        this.genres = new LinkedHashSet<>();
     }
 }

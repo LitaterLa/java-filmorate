@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.InMemoryUserRepository;
+import ru.yandex.practicum.filmorate.repository.impl.JdbcUserRepository;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -14,7 +14,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final InMemoryUserRepository userRepository;
+    private final JdbcUserRepository userRepository;
 
     public User save(User user) {
         userRepository.save(user);
@@ -25,17 +25,17 @@ public class UserServiceImpl implements UserService {
     public void addFriend(Long userId, Long friendId) {
         final User user = getByIdOrThrow(userId);
         final User friend = getByIdOrThrow(friendId);
-        if (userRepository.getFriends(userId).contains(friendId)) {
+        if (userRepository.getFriends(userId).contains(user)) {
             throw new ValidationException("Уже друг");
         }
-        userRepository.addFriend(user, friend);
+        userRepository.addFriend(user.getId(), friend.getId());
     }
 
     @Override
     public void deleteFriend(Long userId, Long friendId) {
         final User user = getByIdOrThrow(userId);
         final User friend = getUserById(friendId);
-        userRepository.deleteFriend(user, friend);
+        userRepository.deleteFriend(user.getId(), friend.getId());
         userRepository.getFriends(userId);
     }
 
@@ -51,6 +51,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public User update(User newUser) {
+        if (userRepository.get(newUser.getId()).isEmpty()) throw new NotFoundException("Пользователь не бы найден");
         return userRepository.update(newUser);
     }
 

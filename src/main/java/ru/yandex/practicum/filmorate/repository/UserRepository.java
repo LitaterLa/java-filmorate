@@ -2,11 +2,12 @@ package ru.yandex.practicum.filmorate.repository;
 
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public interface UserRepository {
-    void save(User user);
+    User save(User user);
 
     void delete(Long id);
 
@@ -14,9 +15,11 @@ public interface UserRepository {
 
     Optional<User> get(Long id);
 
-    void addFriend(User user, User friend);
+    List<User> getAll();
 
-    void deleteFriend(User user, User friend);
+    void addFriend(Long user, Long friend);
+
+    void deleteFriend(Long user, Long friend);
 
     Set<User> getFriends(Long userId);
 
