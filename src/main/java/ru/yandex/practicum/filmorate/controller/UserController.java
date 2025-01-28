@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.sql.Delete;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -52,6 +53,12 @@ public class UserController {
         return userService.update(newUser);
     }
 
+    @DeleteMapping("/{userId}")
+    public void delete(@Validated(Delete.class) @PathVariable Long userId) {
+        log.info("Удаление пользователя ID {}", userId);
+        userService.delete(userId);
+    }
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<User> getAll() {
@@ -90,6 +97,4 @@ public class UserController {
         log.info("получение общих друзей пользователя");
         return userService.getMutualFriends(id, otherId);
     }
-
-
 }

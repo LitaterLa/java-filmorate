@@ -60,6 +60,12 @@ public class FilmController {
         return updatedFilm;
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable @Positive Long id) {
+        log.info("Удаление фильма ID {}", id);
+    }
+
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable @Positive Long id,
                         @PathVariable @Positive Long userId) {
