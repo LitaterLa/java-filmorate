@@ -40,6 +40,7 @@ public class User {
     private String login;
 
     private String name;
+
     @NotNull(groups = {Create.class, Update.class})
     @PastOrPresent(message = "Неверная дата дня рождения", groups = {Create.class, Update.class})
     private LocalDate birthday;
