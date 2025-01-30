@@ -47,6 +47,8 @@ public class Film {
     @NotNull(groups = {Create.class, Update.class})
     private Mpaa mpa;
 
+    private LinkedHashSet<Director> directors;
+
     public Film(String name, String description, LocalDate releaseDate, int duration, LinkedHashSet<Genre> genres, Mpaa mpa) {
         this.name = name;
         this.description = description;
