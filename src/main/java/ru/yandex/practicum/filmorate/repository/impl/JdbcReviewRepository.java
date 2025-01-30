@@ -23,15 +23,15 @@ public class JdbcReviewRepository implements ReviewRepository {
 
     @Override
     public Review save(Review review) {
-        String query = "INSERT INTO reviews (content, is_positive, user_id, film_id, rate) " +
-                "VALUES (:content, :is_positive, :user_id, :film_id, :rate)";
+        String query = "INSERT INTO reviews (content, is_positive, user_id, film_id, useful) " +
+                "VALUES (:content, :is_positive, :user_id, :film_id, :useful)";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("content", review.getContent())
                 .addValue("is_positive", review.getIsPositive())
                 .addValue("user_id", review.getUserId())
                 .addValue("film_id", review.getFilmId())
-                .addValue("rate", review.getUseful());
+                .addValue("useful", review.getUseful());
 
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(query, params, keyHolder);
@@ -49,7 +49,7 @@ public class JdbcReviewRepository implements ReviewRepository {
     @Override
     public Review update(Review review) {
         String query = "UPDATE reviews SET content = :content, is_positive = :is_positive, " +
-                "user_id = :user_id, film_id = :film_id, rate = :rate " +
+                "user_id = :user_id, film_id = :film_id, useful = :useful " +
                 "WHERE review_id = :review_id";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -58,7 +58,7 @@ public class JdbcReviewRepository implements ReviewRepository {
                 .addValue("film_id", review.getFilmId())
                 .addValue("is_positive", review.getIsPositive(), Types.BOOLEAN)
                 .addValue("content", review.getContent())
-                .addValue("rate", review.getUseful());
+                .addValue("useful", review.getUseful());
 
         jdbc.update(query, params);
         return review;
@@ -66,7 +66,7 @@ public class JdbcReviewRepository implements ReviewRepository {
 
     @Override
     public Optional<Review> getById(Integer id) {
-        String query = "SELECT review_id, content, is_positive, user_id, film_id, rate " +
+        String query = "SELECT review_id, content, is_positive, user_id, film_id, useful " +
                 "FROM reviews WHERE review_id = :id";
         try {
             Review review = jdbc.queryForObject(query, new MapSqlParameterSource().addValue("id", id), mapper);
@@ -78,7 +78,7 @@ public class JdbcReviewRepository implements ReviewRepository {
 
     @Override
     public List<Review> getReviewsByFilmId(Optional<Long> filmId, Integer count) {
-        String query = "SELECT review_id, content, is_positive, user_id, film_id, rate " +
+        String query = "SELECT review_id, content, is_positive, user_id, film_id, useful " +
                 "FROM reviews " +
                 (filmId.isPresent() ? "WHERE film_id = :filmId " : "") +
                 "LIMIT :count";
@@ -99,7 +99,7 @@ public class JdbcReviewRepository implements ReviewRepository {
                 .addValue("review_id", reviewId)
                 .addValue("user_id", userId));
 
-        String queryReview = "UPDATE reviews SET rate = rate + 1 WHERE review_id = :review_id";
+        String queryReview = "UPDATE reviews SET useful = useful + 1 WHERE review_id = :review_id";
         jdbc.update(queryReview, new MapSqlParameterSource().addValue("review_id", reviewId));
     }
 
@@ -110,7 +110,7 @@ public class JdbcReviewRepository implements ReviewRepository {
                 .addValue("review_id", reviewId)
                 .addValue("user_id", userId));
 
-        String queryReview = "UPDATE reviews SET rate = rate - 1 WHERE review_id = :review_id";
+        String queryReview = "UPDATE reviews SET useful = useful - 1 WHERE review_id = :review_id";
         jdbc.update(queryReview, new MapSqlParameterSource().addValue("review_id", reviewId));
     }
 
@@ -123,7 +123,7 @@ public class JdbcReviewRepository implements ReviewRepository {
                 .addValue("review_id", reviewId)
                 .addValue("user_id", userId));
 
-        String queryReview = "UPDATE reviews SET rate = rate - 1 WHERE review_id = :review_id";
+        String queryReview = "UPDATE reviews SET useful = useful - 1 WHERE review_id = :review_id";
         jdbc.update(queryReview, new MapSqlParameterSource().addValue("review_id", reviewId));
     }
 
@@ -134,7 +134,7 @@ public class JdbcReviewRepository implements ReviewRepository {
                 .addValue("review_id", reviewId)
                 .addValue("user_id", userId));
 
-        String queryReview = "UPDATE reviews SET rate = rate + 1 WHERE review_id = :review_id";
+        String queryReview = "UPDATE reviews SET useful = useful + 1 WHERE review_id = :review_id";
         jdbc.update(queryReview, new MapSqlParameterSource().addValue("review_id", reviewId));
     }
 }
