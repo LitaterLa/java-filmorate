@@ -310,18 +310,11 @@ public class JdbcFilmRepository implements FilmRepository {
 
     @Override
     public Collection<Film> findByDirector(Long directorId, String sortType) {
-        String sortTypeDB;
-        switch (sortType) {
-            case "likes":
-                sortTypeDB = "lk.likes desc";
-                break;
-            case "year":
-                sortTypeDB = "f.RELEASE_DATE";
-                break;
-            default:
-                sortTypeDB = "f.id";
-                break;
-        }
+        String sortTypeDB = switch (sortType) {
+            case "likes" -> "lk.likes desc";
+            case "year" -> "f.RELEASE_DATE";
+            default -> "f.id";
+        };
         String filmQuery = "SELECT f.id AS film_id, f.name AS film_name, f.description AS film_description, " +
                 "f.release_date AS film_release_date, f.duration AS film_duration, f.rating_id AS film_rating_id, " +
                 "m.id AS rating_id, m.name AS rating_name " +
