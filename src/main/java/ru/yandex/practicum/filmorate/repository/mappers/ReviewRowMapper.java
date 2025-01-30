@@ -11,13 +11,17 @@ import java.sql.SQLException;
 public class ReviewRowMapper implements RowMapper<Review> {
     @Override
     public Review mapRow(ResultSet rs, int rowNum) throws SQLException {
+        Integer useful = rs.getObject("useful", Integer.class);
+        if (useful == null) {
+            useful = 0;
+        }
         return Review.builder()
                 .reviewId(rs.getInt("review_id"))
                 .content(rs.getString("content"))
                 .isPositive(rs.getBoolean("is_positive"))
                 .userId(rs.getLong("user_id"))
                 .filmId(rs.getLong("film_id"))
-                .useful(rs.getObject("useful", Integer.class))
+                .useful(useful)
                 .build();
     }
 }

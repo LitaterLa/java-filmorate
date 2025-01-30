@@ -81,6 +81,7 @@ public class JdbcReviewRepository implements ReviewRepository {
         String query = "SELECT review_id, content, is_positive, user_id, film_id, useful " +
                 "FROM reviews " +
                 (filmId.isPresent() ? "WHERE film_id = :filmId " : "") +
+                "ORDER BY useful DESC " +
                 "LIMIT :count";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
