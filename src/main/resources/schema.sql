@@ -34,8 +34,7 @@ create TABLE IF NOT EXISTS films (
     description VARCHAR(200) NOT NULL,
     release_date DATE NOT NULL,
     duration    INTEGER NOT NULL,
-    rating_id   INTEGER NOT NULL REFERENCES MPAA(id) ON delete CASCADE,
-    director_id INTEGER NOT NULL REFERENCES directors(id) ON delete CASCADE
+    rating_id   INTEGER NOT NULL REFERENCES MPAA(id) ON delete CASCADE
 );
 
 create table if not exists film_directors (
