@@ -73,6 +73,10 @@ public class BaseFilmService implements FilmService {
         filmRepository.removeLike(film, user);
     }
 
+    public Collection<Film> getFilmsByDirector(Long directorId, String sortType) {
+        return filmRepository.findByDirector(directorId, sortType);
+    }
+
     public List<Film> findBestLiked(Integer count) {
         return filmRepository.findBestLiked(count);
     }
