@@ -19,7 +19,7 @@ import ru.yandex.practicum.filmorate.validation.Update;
 public class Review {
 
     @NotNull(groups = {Update.class})
-    private Integer id;
+    private Integer reviewId;
     @NotBlank(message = "Поле не может быть пустым", groups = {Create.class, Update.class})
     private String content;
     @NotNull(groups = {Create.class, Update.class})
@@ -29,5 +29,5 @@ public class Review {
     @NotNull(groups = {Create.class, Update.class})
     private Long filmId;
 
-    private Integer rate;
+    private Integer useful;
 }

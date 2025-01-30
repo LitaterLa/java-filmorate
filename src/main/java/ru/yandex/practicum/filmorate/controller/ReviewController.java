@@ -35,14 +35,14 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.CREATED)
     public Review save(@Validated(Create.class) @RequestBody Review review) {
         Review newReview = service.save(review);
-        log.info("добавление отзыва {}", review.getId());
+        log.info("добавление отзыва {}", review.getReviewId());
         return newReview;
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public Review update(@Validated(Update.class) @RequestBody Review review) {
-        log.info("обновление отзыва ID {}", review.getId());
+        log.info("обновление отзыва ID {}", review.getReviewId());
         return service.update(review);
     }
 
@@ -60,40 +60,42 @@ public class ReviewController {
         return service.getById(id);
     }
 
-    @GetMapping("/filmId/{filmId}/count/{count}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<Review> getReviewsByFilm(@RequestParam(value = "filmId") Long filmId,
-                                         @RequestParam(value = "count", defaultValue = "10") @Positive Integer count) {
-        log.info("получение отзывов по фильму");
-        return service.getReviewsByFilmId(Optional.of(filmId), count);
+    @GetMapping
+    public List<Review> getReviewsByFilm(
+            @RequestParam(value = "filmId", required = false) Long filmId,
+            @RequestParam(value = "count", defaultValue = "10") @Positive Integer count
+    ) {
+        log.info("получение отзывов по фильму {}", filmId);
+        return service.getReviewsByFilmId(Optional.ofNullable(filmId), count);
     }
+
 
     @PutMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void addLike(@PathVariable Integer reviewId,@PathVariable Long userId) {
+    public void addLike(@PathVariable Integer id, @PathVariable Long userId) {
         log.info("добавление лайка отзыву id {}", userId);
-        service.addLike(reviewId, userId);
+        service.addLike(id, userId);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void addDislike(@PathVariable Integer reviewId,@PathVariable Long userId) {
+    public void addDislike(@PathVariable Integer id, @PathVariable Long userId) {
         log.info("добавление дизлайка отзыву id {}", userId);
-        service.addDislike(reviewId, userId);
+        service.addDislike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void removeLike(@PathVariable Integer reviewId,@PathVariable Long userId) {
+    public void removeLike(@PathVariable Integer id, @PathVariable Long userId) {
         log.info("удаление лайка отзыву id {}", userId);
-        service.removeLike(reviewId, userId);
+        service.removeLike(id, userId);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void removeDislike(@PathVariable Integer reviewId,@PathVariable Long userId) {
+    public void removeDislike(@PathVariable Integer id, @PathVariable Long userId) {
         log.info("удаление дизлайка отзыву id {}", userId);
-        service.removeLike(reviewId, userId);
+        service.removeLike(id, userId);
     }
 
 }

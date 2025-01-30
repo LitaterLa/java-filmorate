@@ -30,7 +30,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Review update(Review review) {
-        repository.getById(review.getId()).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
+        repository.getById(review.getReviewId()).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
         return repository.update(review);
     }
 

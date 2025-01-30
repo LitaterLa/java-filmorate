@@ -23,19 +23,20 @@ public class JdbcReviewRepository implements ReviewRepository {
 
     @Override
     public Review save(Review review) {
-        String query = "INSERT INTO reviews (content, is_positive, user_id, film_id) " +
-                "VALUES (:content, :is_positive, :user_id, :film_id)";
+        String query = "INSERT INTO reviews (content, is_positive, user_id, film_id, rate) " +
+                "VALUES (:content, :is_positive, :user_id, :film_id, :rate)";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("content", review.getContent())
                 .addValue("is_positive", review.getIsPositive())
                 .addValue("user_id", review.getUserId())
-                .addValue("film_id", review.getFilmId());
+                .addValue("film_id", review.getFilmId())
+                .addValue("rate", review.getUseful());
 
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(query, params, keyHolder);
 
-        review.setId(Objects.requireNonNull(keyHolder.getKey().intValue()));
+        review.setReviewId(Objects.requireNonNull(keyHolder.getKey().intValue()));
         return review;
     }
 
@@ -52,12 +53,12 @@ public class JdbcReviewRepository implements ReviewRepository {
                 "WHERE review_id = :review_id";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("review_id", review.getId())
+                .addValue("review_id", review.getReviewId())
                 .addValue("user_id", review.getUserId())
                 .addValue("film_id", review.getFilmId())
                 .addValue("is_positive", review.getIsPositive(), Types.BOOLEAN)
                 .addValue("content", review.getContent())
-                .addValue("rate", review.getRate());
+                .addValue("rate", review.getUseful());
 
         jdbc.update(query, params);
         return review;
@@ -92,7 +93,7 @@ public class JdbcReviewRepository implements ReviewRepository {
     @Override
     public void addLike(Integer reviewId, Long userId) {
         String query = "INSERT INTO review_reactions (review_id, user_id, is_like) " +
-                "VALUES (:review_id, :user_id, true) ON CONFLICT DO NOTHING";
+                "VALUES (:review_id, :user_id, true)";
 
         jdbc.update(query, new MapSqlParameterSource()
                 .addValue("review_id", reviewId)
@@ -116,7 +117,7 @@ public class JdbcReviewRepository implements ReviewRepository {
     @Override
     public void addDislike(Integer reviewId, Long userId) {
         String query = "INSERT INTO review_reactions (review_id, user_id, is_like) " +
-                "VALUES (:review_id, :user_id, false) ON CONFLICT DO NOTHING";
+                "VALUES (:review_id, :user_id, false)";
 
         jdbc.update(query, new MapSqlParameterSource()
                 .addValue("review_id", reviewId)
