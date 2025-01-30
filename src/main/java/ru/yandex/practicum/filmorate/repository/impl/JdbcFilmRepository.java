@@ -329,8 +329,8 @@ public class JdbcFilmRepository implements FilmRepository {
                 "m.id AS rating_id, m.name AS rating_name " +
                 "FROM films f " +
                 "LEFT JOIN MPAA m ON f.rating_id = m.id " +
-                "LEFT JOIN (select count(l.USER_ID) as likes, l.FILM_ID from LIKES l group by FILM_ID) lk on f.ID = lk.FILM_ID " +
-                "WHERE exists(SELECT 1 FROM FILM_DIRECTORS fd WHERE fd.DIRECTOR_ID = :directorId) " +
+                "LEFT JOIN (select count(l.USER_ID) as likes, l.FILM_ID from LIKES l group by l.FILM_ID) lk on f.ID = lk.FILM_ID " +
+                "WHERE f.ID in (Select fd.film_id from FILM_DIRECTORS fd WHERE fd.DIRECTOR_ID = :directorId) " +
                 "ORDER BY " + sortTypeDB;
         List<Film> films = jdbc.query(filmQuery, new MapSqlParameterSource()
                         .addValue("directorId", directorId),
