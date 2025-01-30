@@ -3,9 +3,11 @@ package ru.yandex.practicum.filmorate.repository.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
@@ -14,6 +16,7 @@ import ru.yandex.practicum.filmorate.repository.mappers.DirectorRowMapper;
 import ru.yandex.practicum.filmorate.repository.mappers.FilmRowMapper;
 import ru.yandex.practicum.filmorate.repository.mappers.GenreRowMapper;
 
+import java.sql.PreparedStatement;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,6 +26,7 @@ import java.util.stream.Collectors;
 public class JdbcFilmRepository implements FilmRepository {
 
     private final NamedParameterJdbcTemplate jdbc;
+    private final JdbcTemplate jdbcTemplate;
     private final FilmRowMapper mapper;
     private final GenreRowMapper genreMapper;
     private final DirectorRowMapper directorRowMapper;
@@ -285,27 +289,32 @@ public class JdbcFilmRepository implements FilmRepository {
     }
 
     private void addDirectors(Long filmId, Collection<Director> filmDirectors) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
         if (filmDirectors == null || filmDirectors.isEmpty()) {
             return;
         }
 
         String query = "INSERT INTO film_directors (DIRECTOR_ID, FILM_ID) " +
-                "SELECT id, :filmId FROM DIRECTORS WHERE ID IN (:directorIdList) ORDER BY ID";
-
-        Set<Long> directorIdList = new LinkedHashSet<>();
+                "VALUES ( ?, ? )";
         for (Director director : filmDirectors) {
-            directorIdList.add(director.getId());
+            jdbcTemplate.update(connection -> {
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setLong(1, director.getId());
+                statement.setLong(2, filmId);
+                return statement;
+            }, keyHolder);
         }
 
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("filmId", filmId)
-                .addValue("directorIdList", directorIdList);
-        jdbc.update(query, params);
     }
 
     private void removeDirectorFilm(Long id) {
-        String sqlQuery = "DELETE FROM FILM_DIRECTORS WHERE film_id = :filmId";
-        jdbc.update(sqlQuery, new MapSqlParameterSource("filmId", id));
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        String query = "DELETE FROM FILM_DIRECTORS WHERE film_id = ?";
+        jdbcTemplate.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setLong(1, id);
+            return statement;
+        }, keyHolder);
     }
 
     @Override

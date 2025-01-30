@@ -26,14 +26,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;*/
+import static org.assertj.core.api.Assertions.assertThat;
 
-//@JdbcTest
-//@AutoConfigureTestDatabase
-//@RequiredArgsConstructor(onConstructor_ = @Autowired)
-//@Import({JdbcFilmRepository.class, FilmRowMapper.class, GenreRowMapper.class, UserRowMapper.class, MpaaRowMapper.class, JdbcUserRepository.class})
+@JdbcTest
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Import({JdbcFilmRepository.class, FilmRowMapper.class, GenreRowMapper.class, UserRowMapper.class, MpaaRowMapper.class, JdbcUserRepository.class})
 public class FilmDBRepositoryTest {
-    /*private final JdbcFilmRepository filmRepository;
+    private final JdbcFilmRepository filmRepository;
     private final JdbcUserRepository userRepository;
     private final NamedParameterJdbcOperations jdbc;
 
@@ -194,8 +194,8 @@ public class FilmDBRepositoryTest {
         List<Map<String, Object>> results = jdbc.queryForList(query, new MapSqlParameterSource());
 
         assertThat(results).isEmpty();
-    }*/
+    }
 
 
-}
+}*/
 

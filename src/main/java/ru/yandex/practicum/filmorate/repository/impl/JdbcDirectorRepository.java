@@ -2,22 +2,25 @@ package ru.yandex.practicum.filmorate.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.repository.DirectorRepository;
 import ru.yandex.practicum.filmorate.repository.mappers.DirectorRowMapper;
 
+import java.sql.PreparedStatement;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Repository
+@Component
 public class JdbcDirectorRepository implements DirectorRepository {
 
-    private final NamedParameterJdbcOperations jdbc;
+    private final JdbcTemplate jdbc;
     private final DirectorRowMapper mapper;
 
     @Override
@@ -28,11 +31,9 @@ public class JdbcDirectorRepository implements DirectorRepository {
 
     @Override
     public Director findById(Long id) {
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("id", id);
-        String query = "SELECT id, name FROM DIRECTORS WHERE id = :id";
+        String query = "SELECT id, name FROM DIRECTORS WHERE id = ?";
         try {
-            return jdbc.queryForObject(query, params, mapper);
+            return jdbc.queryForObject(query, mapper, id);
         } catch (EmptyResultDataAccessException ignored) {
             return null;
         }
@@ -40,32 +41,43 @@ public class JdbcDirectorRepository implements DirectorRepository {
 
     @Override
     public Director save(Director director) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", director.getName());
-        String query = "INSERT INTO DIRECTORS (NAME) VALUES (:name)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        String query = "INSERT INTO DIRECTORS (NAME) VALUES ( ? )";
 
-        long id = jdbc.update(query, params);
+        jdbc.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(query, new String[]{"id"});
+            statement.setString(1, director.getName());
+            return statement;
+        }, keyHolder);
+
+        long id = Objects.requireNonNull(keyHolder.getKey()).longValue();
         director.setId(id);
         return director;
     }
 
     @Override
     public Director update(Director director) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", director.getName());
-        params.put("id", director.getId());
-        String query = "UPDATE DIRECTORS SET NAME = :name WHERE ID = :id";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        String query = "UPDATE DIRECTORS SET NAME = ? WHERE ID = ?";
+        jdbc.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, director.getName());
+            statement.setLong(2, director.getId());
+            return statement;
+        }, keyHolder);
 
-        jdbc.update(query, params);
-        return director;
+        return findById(director.getId());
     }
 
     @Override
     public void delete(Long id) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("id", id);
-        String query = "DELETE FROM DIRECTORS WHERE ID = :id";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        String query = "DELETE FROM DIRECTORS WHERE ID = ?";
 
-        jdbc.update(query, params);
+        jdbc.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setLong(1, id);
+            return statement;
+        }, keyHolder);
     }
 }
