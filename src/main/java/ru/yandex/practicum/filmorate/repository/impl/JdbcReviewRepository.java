@@ -31,7 +31,7 @@ public class JdbcReviewRepository implements ReviewRepository {
                 .addValue("is_positive", review.getIsPositive())
                 .addValue("user_id", review.getUserId())
                 .addValue("film_id", review.getFilmId())
-                .addValue("useful", review.getUseful());
+                .addValue("useful", review.getUseful() != null ? review.getUseful() : 0);
 
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(query, params, keyHolder);
@@ -93,16 +93,27 @@ public class JdbcReviewRepository implements ReviewRepository {
 
     @Override
     public void addLike(Integer reviewId, Long userId) {
-        String query = "INSERT INTO review_reactions (review_id, user_id, is_like) " +
-                "VALUES (:review_id, :user_id, true)";
-
-        jdbc.update(query, new MapSqlParameterSource()
+        String checkQuery = "SELECT COUNT(*) FROM review_reactions WHERE review_id = :review_id AND user_id = :user_id";
+        Integer count = jdbc.queryForObject(checkQuery, new MapSqlParameterSource()
                 .addValue("review_id", reviewId)
-                .addValue("user_id", userId));
+                .addValue("user_id", userId), Integer.class);
+
+        if (count > 0) {
+            String updateQuery = "UPDATE review_reactions SET is_like = true WHERE review_id = :review_id AND user_id = :user_id";
+            jdbc.update(updateQuery, new MapSqlParameterSource()
+                    .addValue("review_id", reviewId)
+                    .addValue("user_id", userId));
+        } else {
+            String insertQuery = "INSERT INTO review_reactions (review_id, user_id, is_like) VALUES (:review_id, :user_id, true)";
+            jdbc.update(insertQuery, new MapSqlParameterSource()
+                    .addValue("review_id", reviewId)
+                    .addValue("user_id", userId));
+        }
 
         String queryReview = "UPDATE reviews SET useful = useful + 1 WHERE review_id = :review_id";
         jdbc.update(queryReview, new MapSqlParameterSource().addValue("review_id", reviewId));
     }
+
 
     @Override
     public void removeLike(Integer reviewId, Long userId) {
@@ -117,12 +128,22 @@ public class JdbcReviewRepository implements ReviewRepository {
 
     @Override
     public void addDislike(Integer reviewId, Long userId) {
-        String query = "INSERT INTO review_reactions (review_id, user_id, is_like) " +
-                "VALUES (:review_id, :user_id, false)";
-
-        jdbc.update(query, new MapSqlParameterSource()
+        String checkQuery = "SELECT COUNT(*) FROM review_reactions WHERE review_id = :review_id AND user_id = :user_id";
+        Integer count = jdbc.queryForObject(checkQuery, new MapSqlParameterSource()
                 .addValue("review_id", reviewId)
-                .addValue("user_id", userId));
+                .addValue("user_id", userId), Integer.class);
+
+        if (count > 0) {
+            String updateQuery = "UPDATE review_reactions SET is_like = false WHERE review_id = :review_id AND user_id = :user_id";
+            jdbc.update(updateQuery, new MapSqlParameterSource()
+                    .addValue("review_id", reviewId)
+                    .addValue("user_id", userId));
+        } else {
+            String insertQuery = "INSERT INTO review_reactions (review_id, user_id, is_like) VALUES (:review_id, :user_id, false)";
+            jdbc.update(insertQuery, new MapSqlParameterSource()
+                    .addValue("review_id", reviewId)
+                    .addValue("user_id", userId));
+        }
 
         String queryReview = "UPDATE reviews SET useful = useful - 1 WHERE review_id = :review_id";
         jdbc.update(queryReview, new MapSqlParameterSource().addValue("review_id", reviewId));
@@ -130,12 +151,13 @@ public class JdbcReviewRepository implements ReviewRepository {
 
     @Override
     public void removeDislike(Integer reviewId, Long userId) {
-        String query = "DELETE FROM review_reactions WHERE review_id = :review_id AND user_id = :user_id AND is_like = false";
-        jdbc.update(query, new MapSqlParameterSource()
+        String deleteQuery = "DELETE FROM review_reactions WHERE review_id = :review_id AND user_id = :user_id AND is_like = false";
+        jdbc.update(deleteQuery, new MapSqlParameterSource()
                 .addValue("review_id", reviewId)
                 .addValue("user_id", userId));
 
         String queryReview = "UPDATE reviews SET useful = useful + 1 WHERE review_id = :review_id";
         jdbc.update(queryReview, new MapSqlParameterSource().addValue("review_id", reviewId));
     }
+
 }
