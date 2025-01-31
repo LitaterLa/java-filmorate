@@ -402,25 +402,25 @@ public class JdbcFilmRepository implements FilmRepository {
 
         return films;
     }
-  
+
     @Override
     public List<Film> findCommonFilms(Long userId, Long friendId) {
         String query = """
-            SELECT f.id AS film_id, f.name AS film_name, f.description AS film_description,
-                   f.release_date AS film_release_date, f.duration AS film_duration,
-                   f.rating_id AS film_rating_id, m.name AS rating_name, COUNT(l.user_id) AS like_count
-            FROM films f
-            LEFT JOIN likes l ON f.id = l.film_id
-            JOIN MPAA m ON f.rating_id = m.id
-            WHERE f.id IN (
-                SELECT l1.film_id
-                FROM likes l1
-                JOIN likes l2 ON l1.film_id = l2.film_id
-                WHERE l1.user_id = :userId AND l2.user_id = :friendId
-            )
-            GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rating_id, m.name
-            ORDER BY like_count DESC
-            """;
+                SELECT f.id AS film_id, f.name AS film_name, f.description AS film_description,
+                       f.release_date AS film_release_date, f.duration AS film_duration,
+                       f.rating_id AS film_rating_id, m.name AS rating_name, COUNT(l.user_id) AS like_count
+                FROM films f
+                LEFT JOIN likes l ON f.id = l.film_id
+                JOIN MPAA m ON f.rating_id = m.id
+                WHERE f.id IN (
+                    SELECT l1.film_id
+                    FROM likes l1
+                    JOIN likes l2 ON l1.film_id = l2.film_id
+                    WHERE l1.user_id = :userId AND l2.user_id = :friendId
+                )
+                GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rating_id, m.name
+                ORDER BY like_count DESC
+                """;
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("userId", userId)
@@ -436,11 +436,11 @@ public class JdbcFilmRepository implements FilmRepository {
             List<Long> filmIds = films.stream().map(Film::getId).toList();
 
             String genreQuery = """
-                SELECT fg.film_id AS film_id, g.id AS genre_id, g.name AS genre_name
-                FROM film_genres fg
-                JOIN genres g ON fg.genre_id = g.id
-                WHERE fg.film_id IN (:filmIds)
-                """;
+                    SELECT fg.film_id AS film_id, g.id AS genre_id, g.name AS genre_name
+                    FROM film_genres fg
+                    JOIN genres g ON fg.genre_id = g.id
+                    WHERE fg.film_id IN (:filmIds)
+                    """;
 
             MapSqlParameterSource genreParams = new MapSqlParameterSource("filmIds", filmIds);
             List<Map<String, Object>> genreResults = jdbc.queryForList(genreQuery, genreParams);
@@ -460,7 +460,7 @@ public class JdbcFilmRepository implements FilmRepository {
 
         return films;
     }
-  
+
     public Collection<Film> findFilmByUserLikes(Long userId) {
         String filmQuery = "SELECT f.id AS film_id, f.name AS film_name, f.description AS film_description, " +
                 "f.release_date AS film_release_date, f.duration AS film_duration, f.rating_id AS film_rating_id, " +
