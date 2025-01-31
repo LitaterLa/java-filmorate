@@ -23,22 +23,34 @@ public class JdbcReviewRepository implements ReviewRepository {
 
     @Override
     public Review save(Review review) {
-        String query = "INSERT INTO reviews (content, is_positive, user_id, film_id, useful) " +
+        String queryWithUseful = "INSERT INTO reviews (content, is_positive, user_id, film_id, useful) " +
                 "VALUES (:content, :is_positive, :user_id, :film_id, :useful)";
+        String queryWithoutUseful = "INSERT INTO reviews (content, is_positive, user_id, film_id, useful) " +
+                "VALUES (:content, :is_positive, :user_id, :film_id, 0)";
+
+        boolean hasUseful = review.getUseful() != null;
+        String query = hasUseful ? queryWithUseful : queryWithoutUseful;
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("content", review.getContent())
                 .addValue("is_positive", review.getIsPositive())
                 .addValue("user_id", review.getUserId())
-                .addValue("film_id", review.getFilmId())
-                .addValue("useful", review.getUseful() != null ? review.getUseful() : 0);
+                .addValue("film_id", review.getFilmId());
+
+        if (hasUseful) {
+            params.addValue("useful", review.getUseful());
+        }
 
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(query, params, keyHolder);
 
         review.setReviewId(Objects.requireNonNull(keyHolder.getKey().intValue()));
+        review.setUseful(review.getUseful() != null ? review.getUseful() : 0); // Присваиваем 0 в объекте
+
         return review;
     }
+
+
 
     @Override
     public void delete(Integer id) {
@@ -58,7 +70,7 @@ public class JdbcReviewRepository implements ReviewRepository {
                 .addValue("film_id", review.getFilmId())
                 .addValue("is_positive", review.getIsPositive(), Types.BOOLEAN)
                 .addValue("content", review.getContent())
-                .addValue("useful", review.getUseful());
+                .addValue("useful", review.getUseful() != null ? review.getUseful() : 0);
 
         jdbc.update(query, params);
         return review;
