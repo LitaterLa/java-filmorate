@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.UserEvent;
 import ru.yandex.practicum.filmorate.repository.impl.JdbcReviewRepository;
 
 import java.util.List;
@@ -15,22 +16,28 @@ public class ReviewServiceImpl implements ReviewService {
     private final JdbcReviewRepository repository;
     private final BaseFilmService filmService;
     private final UserServiceImpl userService;
+    private final EventService eventService;
 
     @Override
     public Review save(Review review) {
         userService.getUserById(review.getUserId());
         filmService.getFilmByIdOrThrow(review.getFilmId());
-        return repository.save(review);
+        Review result = repository.save(review);
+        eventService.createEvent(result.getUserId(), result.getReviewId(), UserEvent.EventType.REVIEW, UserEvent.EventOperation.ADD);
+        return result;
     }
 
     @Override
     public void delete(Integer id) {
+        Review review = repository.getById(id).orElseThrow();
         repository.delete(id);
+        eventService.createEvent(review.getUserId(), review.getReviewId(), UserEvent.EventType.REVIEW, UserEvent.EventOperation.REMOVE);
     }
 
     @Override
     public Review update(Review review) {
         repository.getById(review.getReviewId()).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
+        eventService.createEvent(review.getUserId(), review.getReviewId(), UserEvent.EventType.REVIEW, UserEvent.EventOperation.UPDATE);
         return repository.update(review);
     }
 

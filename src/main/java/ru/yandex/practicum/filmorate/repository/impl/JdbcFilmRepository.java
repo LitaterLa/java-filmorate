@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.repository.impl;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -21,7 +20,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-@Slf4j
 @RequiredArgsConstructor
 public class JdbcFilmRepository implements FilmRepository {
 
