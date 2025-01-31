@@ -50,6 +50,11 @@ public class UserServiceImpl implements UserService {
         return getByIdOrThrow(id);
     }
 
+    @Override
+    public void delete(Long id) {
+        userRepository.delete(id);
+    }
+
     public User update(User newUser) {
         if (userRepository.get(newUser.getId()).isEmpty()) throw new NotFoundException("Пользователь не бы найден");
         return userRepository.update(newUser);

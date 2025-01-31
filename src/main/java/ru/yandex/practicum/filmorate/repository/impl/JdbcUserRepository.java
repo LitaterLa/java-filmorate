@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.repository.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -11,17 +13,14 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 import ru.yandex.practicum.filmorate.repository.mappers.UserRowMapper;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
+@Slf4j
 @Repository
 public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcOperations jdbc;
     private final UserRowMapper mapper;
+    private final JdbcTemplate jdbcTemplate;
 
     private static final String FIND_ALL_QUERY = "SELECT id, login, name, email, birthday FROM users";
     private static final String FIND_BY_ID_QUERY = "SELECT id, login, name, email, birthday FROM users WHERE id = :id";
@@ -29,31 +28,37 @@ public class JdbcUserRepository implements UserRepository {
             "VALUES (:login, :name, :email, :birthday)";
     private static final String UPDATE_QUERY = "UPDATE users SET name = :name, login = :login, email = :email, " +
             " birthday= :birthday WHERE id = :id";
-    private static final String DELETE_QUERY = "DELETE FROM users WHERE id = :id";
 
     @Autowired
-    public JdbcUserRepository(NamedParameterJdbcOperations jdbc, UserRowMapper mapper) {
+    public JdbcUserRepository(NamedParameterJdbcOperations jdbc, UserRowMapper mapper, JdbcTemplate jdbcTemplate) {
         this.jdbc = jdbc;
         this.mapper = mapper;
+        this.jdbcTemplate = jdbcTemplate;
     }
-
 
     @Override
     public User save(User user) {
         Map<String, Object> params = new HashMap<>();
         params.put("login", user.getLogin());
+        if (Objects.equals(user.getName(), "")) {
+            user.setName(user.getLogin());
+        }
         params.put("name", user.getName());
         params.put("email", user.getEmail());
         params.put("birthday", user.getBirthday());
 
         long id = insert(INSERT_QUERY, params);
+
+        log.info("Inserted user: {}}", user);
+
         user.setId(id);
         return user;
     }
 
     @Override
     public void delete(Long id) {
-        delete(DELETE_QUERY, id);
+        String q = "DELETE FROM USERS WHERE ID = ?";
+        jdbcTemplate.update(q, id);
     }
 
     @Override
@@ -61,10 +66,14 @@ public class JdbcUserRepository implements UserRepository {
         Map<String, Object> params = new HashMap<>();
         params.put("id", user.getId());
         params.put("login", user.getLogin());
+        if (Objects.equals(user.getName(), "")) {
+            user.setName(user.getLogin());
+        }
         params.put("name", user.getName());
         params.put("email", user.getEmail());
         params.put("birthday", user.getBirthday());
         update(UPDATE_QUERY, params);
+
         return user;
     }
 
@@ -148,7 +157,7 @@ public class JdbcUserRepository implements UserRepository {
         if (id != null) {
             return id;
         } else {
-            throw new InternalServerException("Не удалось сохранить данные пользователя");
+            throw new InternalServerException("Не удалось сохранить данные пользователя!");
         }
     }
 

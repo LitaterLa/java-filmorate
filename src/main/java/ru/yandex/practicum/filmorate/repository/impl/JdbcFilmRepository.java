@@ -215,9 +215,9 @@ public class JdbcFilmRepository implements FilmRepository {
         removeLikeFilm(id);
         removeGenreFilm(id);
 
-        String sqlQuery = "DELETE FROM films WHERE id = :filmId";
+        String deleteFilmQuery = "DELETE FROM films WHERE id = :filmId";
 
-        jdbc.update(sqlQuery, new MapSqlParameterSource("filmId", id));
+        jdbc.update(deleteFilmQuery, new MapSqlParameterSource("filmId", id));
     }
 
 

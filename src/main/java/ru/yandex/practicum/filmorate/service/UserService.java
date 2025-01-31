@@ -12,4 +12,6 @@ public interface UserService {
     Set<User> getFriends(Long userId);
 
     User getUserById(Long id);
+
+    void delete(Long id);
 }
