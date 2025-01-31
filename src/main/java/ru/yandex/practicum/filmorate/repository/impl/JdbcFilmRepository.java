@@ -426,11 +426,38 @@ public class JdbcFilmRepository implements FilmRepository {
                 .addValue("userId", userId)
                 .addValue("friendId", friendId);
 
-        return jdbc.query(query, params, (rs, rowNum) -> {
+        List<Film> films = jdbc.query(query, params, (rs, rowNum) -> {
             Film film = mapper.mapFilm(rs);
             Mpaa mpaa = mapper.mapMpaa(rs);
             film.setMpa(mpaa);
             return film;
         });
+        if (!films.isEmpty()) {
+            List<Long> filmIds = films.stream().map(Film::getId).toList();
+
+            String genreQuery = """
+                SELECT fg.film_id AS film_id, g.id AS genre_id, g.name AS genre_name
+                FROM film_genres fg
+                JOIN genres g ON fg.genre_id = g.id
+                WHERE fg.film_id IN (:filmIds)
+                """;
+
+            MapSqlParameterSource genreParams = new MapSqlParameterSource("filmIds", filmIds);
+            List<Map<String, Object>> genreResults = jdbc.queryForList(genreQuery, genreParams);
+
+            Map<Long, Set<Genre>> genresByFilm = new HashMap<>();
+            for (Map<String, Object> row : genreResults) {
+                Long filmId = ((Number) row.get("film_id")).longValue();
+                int genreId = (int) row.get("genre_id");
+                String genreName = (String) row.get("genre_name");
+
+                genresByFilm.computeIfAbsent(filmId, k -> new LinkedHashSet<>())
+                        .add(new Genre(genreId, genreName));
+            }
+
+            films.forEach(film -> film.setGenres(new LinkedHashSet<>(genresByFilm.getOrDefault(film.getId(), Set.of()))));
+        }
+
+        return films;
     }
 }
