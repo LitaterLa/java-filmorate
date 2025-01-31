@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.repository.impl;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,7 +14,6 @@ import ru.yandex.practicum.filmorate.repository.mappers.UserRowMapper;
 
 import java.util.*;
 
-@Slf4j
 @Repository
 public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcOperations jdbc;
@@ -48,8 +46,6 @@ public class JdbcUserRepository implements UserRepository {
         params.put("birthday", user.getBirthday());
 
         long id = insert(INSERT_QUERY, params);
-
-        log.info("Inserted user: {}}", user);
 
         user.setId(id);
         return user;

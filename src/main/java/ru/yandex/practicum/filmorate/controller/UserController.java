@@ -6,17 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.sql.Delete;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.model.Film;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserEvent;
+import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.UserServiceImpl;
 import ru.yandex.practicum.filmorate.validation.Create;
 import ru.yandex.practicum.filmorate.validation.Update;
@@ -31,6 +24,7 @@ import java.util.Set;
 @Validated
 public class UserController {
     private final UserServiceImpl userService;
+    private final EventService eventService;
 
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
@@ -98,9 +92,14 @@ public class UserController {
         log.info("получение общих друзей пользователя");
         return userService.getMutualFriends(id, otherId);
     }
-
     @GetMapping("/{id}/recommendations")
     public Collection<Film> getFilmRecommendations(@PathVariable Long id) {
         return userService.getFilmRecommendations(id);
     }
-}
+  
+    @GetMapping("/{id}/feed")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<UserEvent> getAllUserFeeds(@PathVariable @Positive Long id) {
+        log.info("запрашиваются события пользователя с id {}", id);
+        return eventService.getEventByUser(id);
+    }

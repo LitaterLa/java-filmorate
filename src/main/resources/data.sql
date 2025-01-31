@@ -11,4 +11,12 @@ MERGE INTO genres (id, name)
            (4, 'Триллер'),
            (5, 'Документальный'),
            (6, 'Боевик');
+INSERT INTO EVENTS_TYPES (EVENT_TYPE_NAME)
+    VALUES ('LIKE'),
+           ('REVIEW'),
+           ('FRIEND');
 
+INSERT INTO EVENTS_OPERATIONS (EVENT_OPERATION_NAME)
+    VALUES ('REMOVE'),
+           ('ADD'),
+           ('UPDATE');
