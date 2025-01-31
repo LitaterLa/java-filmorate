@@ -15,7 +15,6 @@ import ru.yandex.practicum.filmorate.repository.mappers.UserRowMapper;
 
 import java.util.*;
 
-@Slf4j
 @Repository
 public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcOperations jdbc;
@@ -48,8 +47,6 @@ public class JdbcUserRepository implements UserRepository {
         params.put("birthday", user.getBirthday());
 
         long id = insert(INSERT_QUERY, params);
-
-        log.info("Inserted user: {}}", user);
 
         user.setId(id);
         return user;

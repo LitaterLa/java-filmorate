@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserEvent;
 import ru.yandex.practicum.filmorate.repository.impl.JdbcUserRepository;
 
 import java.util.Collection;
@@ -15,6 +16,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final JdbcUserRepository userRepository;
+    private final EventService eventService;
 
     public User save(User user) {
         userRepository.save(user);
@@ -29,6 +31,7 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException("Уже друг");
         }
         userRepository.addFriend(user.getId(), friend.getId());
+        eventService.createEvent(userId, friendId, UserEvent.EventType.FRIEND, UserEvent.EventOperation.ADD);
     }
 
     @Override
@@ -36,6 +39,7 @@ public class UserServiceImpl implements UserService {
         final User user = getByIdOrThrow(userId);
         final User friend = getUserById(friendId);
         userRepository.deleteFriend(user.getId(), friend.getId());
+        eventService.createEvent(userId, friendId, UserEvent.EventType.FRIEND, UserEvent.EventOperation.REMOVE);
         userRepository.getFriends(userId);
     }
 
