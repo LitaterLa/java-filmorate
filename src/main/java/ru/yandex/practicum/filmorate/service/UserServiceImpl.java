@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.repository.impl.JdbcFilmRepository;
 import ru.yandex.practicum.filmorate.model.UserEvent;
 import ru.yandex.practicum.filmorate.repository.impl.JdbcUserRepository;
 
@@ -16,6 +18,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final JdbcUserRepository userRepository;
+    private final JdbcFilmRepository filmRepository;
     private final EventService eventService;
 
     public User save(User user) {
@@ -74,5 +77,9 @@ public class UserServiceImpl implements UserService {
 
     private User getByIdOrThrow(Long id) {
         return userRepository.get(id).orElseThrow(() -> new NotFoundException(" не найден Пользователь ID=" + id));
+    }
+
+    public Collection<Film> getFilmRecommendations(Long userId) {
+        return filmRepository.findFilmByUserLikes(userId);
     }
 }

@@ -402,7 +402,7 @@ public class JdbcFilmRepository implements FilmRepository {
 
         return films;
     }
-
+  
     @Override
     public List<Film> findCommonFilms(Long userId, Long friendId) {
         String query = """
@@ -459,5 +459,25 @@ public class JdbcFilmRepository implements FilmRepository {
         }
 
         return films;
+    }
+  
+    public Collection<Film> findFilmByUserLikes(Long userId) {
+        String filmQuery = "SELECT f.id AS film_id, f.name AS film_name, f.description AS film_description, " +
+                "f.release_date AS film_release_date, f.duration AS film_duration, f.rating_id AS film_rating_id, " +
+                "m.id AS rating_id, m.name AS rating_name " +
+                "FROM films f " +
+                "LEFT JOIN MPAA m ON f.rating_id = m.id " +
+                "WHERE f.id IN (SELECT l.film_id FROM LIKES l " +
+                "WHERE l.USER_ID IN (SELECT l2.USER_ID FROM LIKES l1 JOIN LIKES l2 ON l1.FILM_ID = l2.FILM_ID " +
+                "WHERE l1.USER_ID = :userId AND l2.USER_ID <> :userId GROUP BY l2.USER_ID) " +
+                " AND l.FILM_ID NOT IN (SELECT lk.FILM_ID FROM LIKES lk WHERE lk.USER_ID = :userId))";
+
+        return jdbc.query(filmQuery, new MapSqlParameterSource().addValue("userId", userId),
+                (rs, rowNum) -> {
+                    Film film = mapper.mapFilm(rs);
+                    Mpaa mpaa = mapper.mapMpaa(rs);
+                    film.setMpa(mpaa);
+                    return film;
+                });
     }
 }
