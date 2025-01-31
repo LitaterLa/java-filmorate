@@ -7,6 +7,7 @@ import org.hibernate.sql.Delete;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.UserEvent;
 import ru.yandex.practicum.filmorate.service.EventService;
@@ -91,6 +92,11 @@ public class UserController {
                                              @PathVariable @Positive Long otherId) {
         log.info("получение общих друзей пользователя");
         return userService.getMutualFriends(id, otherId);
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public Collection<Film> getFilmRecommendations(@PathVariable Long id) {
+        return userService.getFilmRecommendations(id);
     }
 
     @GetMapping("/{id}/feed")
