@@ -29,5 +29,5 @@ public class Review {
     @NotNull(groups = {Create.class, Update.class})
     private Long filmId;
 
-    private Integer useful = 0;
+    private Integer useful;
 }
