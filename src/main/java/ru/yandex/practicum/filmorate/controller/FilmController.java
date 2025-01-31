@@ -64,6 +64,7 @@ public class FilmController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable @Positive Long id) {
         log.info("Удаление фильма ID {}", id);
+        filmService.delete(id);
     }
 
     @PutMapping("/{id}/like/{userId}")

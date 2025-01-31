@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.repository.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,6 +15,7 @@ import ru.yandex.practicum.filmorate.repository.mappers.UserRowMapper;
 
 import java.util.*;
 
+@Slf4j
 @Repository
 public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcOperations jdbc;
@@ -34,20 +36,21 @@ public class JdbcUserRepository implements UserRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-
     @Override
     public User save(User user) {
         Map<String, Object> params = new HashMap<>();
         params.put("login", user.getLogin());
         if (Objects.equals(user.getName(), "")) {
-            params.put("name", user.getLogin());
-        } else {
-            params.put("name", user.getName());
+            user.setName(user.getLogin());
         }
+        params.put("name", user.getName());
         params.put("email", user.getEmail());
         params.put("birthday", user.getBirthday());
 
         long id = insert(INSERT_QUERY, params);
+
+        log.info("Inserted user: {}}", user);
+
         user.setId(id);
         return user;
     }
@@ -63,10 +66,14 @@ public class JdbcUserRepository implements UserRepository {
         Map<String, Object> params = new HashMap<>();
         params.put("id", user.getId());
         params.put("login", user.getLogin());
+        if (Objects.equals(user.getName(), "")) {
+            user.setName(user.getLogin());
+        }
         params.put("name", user.getName());
         params.put("email", user.getEmail());
         params.put("birthday", user.getBirthday());
         update(UPDATE_QUERY, params);
+
         return user;
     }
 
