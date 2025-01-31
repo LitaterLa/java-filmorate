@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserEvent;
 import ru.yandex.practicum.filmorate.repository.impl.JdbcFilmRepository;
 import ru.yandex.practicum.filmorate.repository.impl.JdbcGenreRepository;
 import ru.yandex.practicum.filmorate.repository.impl.JdbcMpaaRepository;
@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BaseFilmService implements FilmService {
@@ -26,6 +25,7 @@ public class BaseFilmService implements FilmService {
     private final JdbcUserRepository userRepository;
     private final JdbcMpaaRepository mpaaRepository;
     private final JdbcGenreRepository genreRepository;
+    private final EventService eventService;
 
     public Film save(Film film) {
         mpaaRepository.getById(film.getMpa().getId())
@@ -66,6 +66,7 @@ public class BaseFilmService implements FilmService {
         Film film = getFilmByIdOrThrow(filmId);
         User user = getUserByIdOrThrow(userId);
         filmRepository.addLike(film, user);
+        eventService.createEvent(userId, filmId, UserEvent.EventType.LIKE, UserEvent.EventOperation.ADD);
     }
 
     @Override
@@ -73,6 +74,7 @@ public class BaseFilmService implements FilmService {
         Film film = getFilmByIdOrThrow(filmId);
         User user = getUserByIdOrThrow(userId);
         filmRepository.removeLike(film, user);
+        eventService.createEvent(userId, filmId, UserEvent.EventType.LIKE, UserEvent.EventOperation.REMOVE);
     }
 
     public Collection<Film> getFilmsByDirector(Long directorId, String sortType) {
