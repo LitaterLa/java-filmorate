@@ -99,4 +99,12 @@ public class BaseFilmService implements FilmService {
         return userRepository.get(userId).orElseThrow(() -> new NotFoundException("Not found user ID=" + userId));
     }
 
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        userRepository.get(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден: userId=" + userId));
+        userRepository.get(friendId).orElseThrow(() -> new NotFoundException("Пользователь не найден: friendId=" + friendId));
+
+        return filmRepository.findCommonFilms(userId, friendId);
+    }
+
 }
+
