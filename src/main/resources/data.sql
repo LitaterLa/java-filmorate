@@ -4,6 +4,7 @@ MERGE INTO MPAA (id, name)
            (3, 'PG-13'),
            (4, 'R'),
            (5, 'NC-17');
+
 MERGE INTO genres (id, name)
     VALUES (1, 'Комедия'),
            (2, 'Драма'),
@@ -11,6 +12,7 @@ MERGE INTO genres (id, name)
            (4, 'Триллер'),
            (5, 'Документальный'),
            (6, 'Боевик');
+
 INSERT INTO EVENTS_TYPES (EVENT_TYPE_NAME)
     VALUES ('LIKE'),
            ('REVIEW'),
@@ -22,39 +24,24 @@ INSERT INTO EVENTS_OPERATIONS (EVENT_OPERATION_NAME)
            ('UPDATE');
 
 INSERT INTO films (id, name, description, release_date, duration, rating_id)
-VALUES
-    (1, 'Film 1', 'Description 1', '1967-09-03', 145, 5),
-    (2, 'Film 2', 'Description 2', '1967-09-03', 145, 4),
-    (3, 'Film 3', 'Description 3', '1967-09-03', 145, 3);
+VALUES (1, 'New film', 'New film about friends', '1999-04-30', 120, 3),
+       (2, 'New film with director', 'Film with director', '1999-04-30', 120, 3),
+       (3, 'Old classic', 'Classic film', '1980-06-15', 100, 4);
 
-INSERT INTO film_genres (film_id, genre_id)
-VALUES
-    (1, 1),
-    (2, 2),
-    (2, 3),
-    (3, 4);
+INSERT INTO film_genres (film_id, genre_id) VALUES (1, 1), (1, 2);
+INSERT INTO film_genres (film_id, genre_id) VALUES (2, 1);
+INSERT INTO film_genres (film_id, genre_id) VALUES (3, 3);
 
-INSERT INTO directors (id, name)
-VALUES
-    (1, 'Director A'),
-    (2, 'Director B');
+MERGE INTO directors (id, name)
+    VALUES (1, 'Director updated');
 
-INSERT INTO film_directors (film_id, director_id)
-VALUES
-    (1, 1),
-    (2, 1),
-    (3, 2);
+INSERT INTO film_directors (director_id, film_id) VALUES (1, 2);
 
 INSERT INTO users (id, login, name, email, birthday)
-VALUES
-    (1, 'user1', 'User One', 'user1@example.com', '1980-01-01'),
-    (2, 'user2', 'User Two', 'user2@example.com', '1990-02-02');
+VALUES (1, 'user1', 'User One', 'user1@example.com', '1990-01-01'),
+       (2, 'user2', 'User Two', 'user2@example.com', '1992-02-02');
 
 INSERT INTO likes (film_id, user_id)
-VALUES
-    (1, 1),
-    (2, 2),
-    (3, 1);
+VALUES (1, 1), (1, 2), (2, 1);
 
 ALTER TABLE films ALTER COLUMN id RESTART WITH 4;
-ALTER TABLE users ALTER COLUMN id RESTART WITH 3;
