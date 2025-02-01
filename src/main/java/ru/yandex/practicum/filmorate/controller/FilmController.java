@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.BaseFilmService;
 import ru.yandex.practicum.filmorate.validation.Create;
@@ -35,6 +36,9 @@ public class FilmController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film save(@Validated(Create.class) @RequestBody Film film) {
+        if (film.getId() != null) {
+            throw new ValidationException("ID фильма должен быть пустым при создании.");
+        }
         Film savedFilm = filmService.save(film);
         log.info("сохранение фильма {} ID {}", savedFilm.getName(), savedFilm.getId());
         return savedFilm;

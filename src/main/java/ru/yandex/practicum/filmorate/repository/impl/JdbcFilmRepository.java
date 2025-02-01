@@ -160,6 +160,8 @@ public class JdbcFilmRepository implements FilmRepository {
             throw new ValidationException("У фильма должен быть рейтинг");
         }
 
+        film.setId(null);
+
         String sqlQuery = "INSERT INTO films (name, description, release_date, duration, rating_id) " +
                 "VALUES (:name, :description, :releaseDate, :duration, :ratingId)";
 

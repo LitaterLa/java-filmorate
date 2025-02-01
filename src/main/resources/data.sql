@@ -38,3 +38,4 @@ INSERT INTO film_directors (director_id, film_id) VALUES (1, 1);
 INSERT INTO film_directors (director_id, film_id) VALUES (2, 2);
 INSERT INTO film_directors (director_id, film_id) VALUES (2, 3);
 
+ALTER TABLE films ALTER COLUMN id RESTART WITH 4;
