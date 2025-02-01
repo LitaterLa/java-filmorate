@@ -105,7 +105,7 @@ public class FilmController {
         return filmService.searchFilm(query, searchBy);
     }
 
-    @GetMapping("/popular")
+    @GetMapping("/films/popular")
     @ResponseStatus(HttpStatus.OK)
     public List<Film> getMostPopularFilms(
             @RequestParam(value = "count", defaultValue = "10") @Positive Integer count,
