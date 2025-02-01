@@ -10,5 +10,4 @@ public interface GenreRepository {
     Optional<Genre> getById(long id);
 
     List<Genre> getAll();
-
 }

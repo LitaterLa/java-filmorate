@@ -486,13 +486,15 @@ public class JdbcFilmRepository implements FilmRepository {
         StringBuilder query = new StringBuilder("""
         SELECT f.id AS film_id, f.name AS film_name, f.description AS film_description,
                f.release_date AS film_release_date, f.duration AS film_duration,
-               f.rating_id AS film_rating_id, m.name AS rating_name, COUNT(l.user_id) AS like_count
+               f.rating_id AS film_rating_id, m.name AS rating_name,
+               STRING_AGG(g.name, ', ') AS genres, COUNT(l.user_id) AS like_count
         FROM films f
         LEFT JOIN likes l ON f.id = l.film_id
         JOIN MPAA m ON f.rating_id = m.id
         LEFT JOIN film_genres fg ON f.id = fg.film_id
+        LEFT JOIN genres g ON fg.genre_id = g.id
         WHERE 1=1
-        """);
+    """);
 
         MapSqlParameterSource params = new MapSqlParameterSource();
 
@@ -502,7 +504,7 @@ public class JdbcFilmRepository implements FilmRepository {
         }
 
         if (year != null) {
-            query.append(" AND YEAR(f.release_date) = :year");
+            query.append(" AND EXTRACT(YEAR FROM f.release_date) = :year");
             params.addValue("year", year);
         }
 
@@ -517,6 +519,17 @@ public class JdbcFilmRepository implements FilmRepository {
             Film film = mapper.mapFilm(rs);
             Mpaa mpaa = mapper.mapMpaa(rs);
             film.setMpa(mpaa);
+
+            String genres = rs.getString("genres");
+            if (genres != null && !genres.isEmpty()) {
+                List<Genre> genreList = Arrays.stream(genres.split(", "))
+                        .map(genreName -> new Genre(null, genreName))
+                        .collect(Collectors.toList());
+                film.setGenres(new LinkedHashSet<>(genreList));
+            } else {
+                film.setGenres(new LinkedHashSet<>());
+            }
+
             return film;
         });
     }

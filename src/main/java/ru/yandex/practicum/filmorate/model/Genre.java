@@ -19,11 +19,11 @@ import java.util.Set;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Genre {
     @EqualsAndHashCode.Include
-    private int id;
+    private Integer id;
     private String name;
     private Set<Film> films = new HashSet<>();
 
-    public Genre(int id, String name) {
+    public Genre(Integer id, String name) {
         this.id = id;
         this.name = name;
     }

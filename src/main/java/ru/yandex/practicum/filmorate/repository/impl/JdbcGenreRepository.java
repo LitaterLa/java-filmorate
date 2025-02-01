@@ -43,5 +43,4 @@ public class JdbcGenreRepository implements GenreRepository {
         String sqlQuery = "SELECT id, name FROM genres WHERE id IN (:genreIds)";
         return jdbc.query(sqlQuery, new MapSqlParameterSource("genreIds", genreIds), mapper);
     }
-
 }
