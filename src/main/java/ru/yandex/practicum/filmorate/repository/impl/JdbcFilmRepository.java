@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.repository.FilmRepository;
@@ -487,9 +486,9 @@ public class JdbcFilmRepository implements FilmRepository {
     @Override
     public List<Film> findPopularFilms(int count, Integer genreId, Integer year) {
         String sql = """
-                SELECT f.id, f.name, f.description, f.release_date, f.duration, 
-                       f.rating_id, m.name AS rating_name, 
-                       COALESCE(STRING_AGG(DISTINCT g.id || ':' || g.name, ','), '') AS genres, 
+                SELECT f.id, f.name, f.description, f.release_date, f.duration,
+                       f.rating_id, m.name AS rating_name,
+                       COALESCE(STRING_AGG(DISTINCT g.id || ':' || g.name, ','), '') AS genres,
                        COUNT(DISTINCT l.user_id) AS like_count
                 FROM films f
                 LEFT JOIN likes l ON f.id = l.film_id
@@ -512,7 +511,7 @@ public class JdbcFilmRepository implements FilmRepository {
         }
 
         sql += """
-                GROUP BY f.id, f.name, f.description, f.release_date, f.duration, 
+                GROUP BY f.id, f.name, f.description, f.release_date, f.duration,
                          f.rating_id, m.name
                 ORDER BY like_count DESC
                 LIMIT ?
