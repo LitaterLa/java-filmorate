@@ -480,4 +480,35 @@ public class JdbcFilmRepository implements FilmRepository {
                     return film;
                 });
     }
+
+    @Override
+    public List<Film> findMostPopularFilms(Integer count, Integer genreId, Integer year) {
+        String sql = """
+        SELECT f.id, f.name AS film_name, f.description, f.release_date, f.duration, f.rating_id,
+               COALESCE(like_count, 0) AS likes, m.id AS rating_id, m.name AS rating_name
+        FROM films f
+        LEFT JOIN (
+            SELECT film_id, COUNT(user_id) AS like_count
+            FROM likes
+            GROUP BY film_id
+        ) l ON f.id = l.film_id
+        LEFT JOIN MPAA m ON f.rating_id = m.id
+        WHERE (:genreId IS NULL OR f.id IN (SELECT film_id FROM film_genres WHERE genre_id = :genreId))
+        AND (:year IS NULL OR YEAR(f.release_date) = :year)
+        ORDER BY likes DESC
+        LIMIT :count
+    """;
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("count", count)
+                .addValue("genreId", genreId)
+                .addValue("year", year);
+
+        return jdbc.query(sql, params, (rs, rowNum) -> {
+            Film film = mapper.mapFilm(rs);
+            Mpaa mpaa = mapper.mapMpaa(rs);
+            film.setMpa(mpaa);
+            return film;
+        });
+    }
 }

@@ -107,5 +107,10 @@ public class BaseFilmService implements FilmService {
     private User getUserByIdOrThrow(Long userId) {
         return userRepository.get(userId).orElseThrow(() -> new NotFoundException("Not found user ID=" + userId));
     }
+
+    @Override
+    public List<Film> findMostPopularFilms(Integer count, Integer genreId, Integer year) {
+        return filmRepository.findMostPopularFilms(count, genreId, year);
+    }
 }
 

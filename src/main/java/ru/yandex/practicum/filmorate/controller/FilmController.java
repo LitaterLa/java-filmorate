@@ -105,6 +105,15 @@ public class FilmController {
         return filmService.searchFilm(query, searchBy);
     }
 
+    @GetMapping("/popular")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Film> getMostPopularFilms(
+            @RequestParam(value = "count", defaultValue = "10") @Positive Integer count,
+            @RequestParam(value = "genreId", required = false) Integer genreId,
+            @RequestParam(value = "year", required = false) Integer year) {
+        log.info("Запрос топ-{} популярных фильмов с фильтрацией по жанру={} и году={}", count, genreId, year);
+        return filmService.findMostPopularFilms(count, genreId, year);
+    }
 }
 
 
