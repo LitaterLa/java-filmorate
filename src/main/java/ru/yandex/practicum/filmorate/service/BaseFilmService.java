@@ -7,10 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.UserEvent;
-import ru.yandex.practicum.filmorate.repository.impl.JdbcFilmRepository;
-import ru.yandex.practicum.filmorate.repository.impl.JdbcGenreRepository;
-import ru.yandex.practicum.filmorate.repository.impl.JdbcMpaaRepository;
-import ru.yandex.practicum.filmorate.repository.impl.JdbcUserRepository;
+import ru.yandex.practicum.filmorate.repository.impl.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +23,7 @@ public class BaseFilmService implements FilmService {
     private final JdbcMpaaRepository mpaaRepository;
     private final JdbcGenreRepository genreRepository;
     private final EventService eventService;
+    private final SearchRepositoryImpl searchRepository;
 
     public Film save(Film film) {
         mpaaRepository.getById(film.getMpa().getId())
@@ -95,10 +93,6 @@ public class BaseFilmService implements FilmService {
         return filmRepository.get(filmId).orElseThrow(() -> new NotFoundException("not found film ID=" + filmId));
     }
 
-    private User getUserByIdOrThrow(Long userId) {
-        return userRepository.get(userId).orElseThrow(() -> new NotFoundException("Not found user ID=" + userId));
-    }
-
     public List<Film> getCommonFilms(Long userId, Long friendId) {
         userRepository.get(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден: userId=" + userId));
         userRepository.get(friendId).orElseThrow(() -> new NotFoundException("Пользователь не найден: friendId=" + friendId));
@@ -106,5 +100,12 @@ public class BaseFilmService implements FilmService {
         return filmRepository.findCommonFilms(userId, friendId);
     }
 
+    public List<Film> searchFilm(String query, String searchBy) {
+        return searchRepository.searchFilm(query, searchBy);
+    }
+
+    private User getUserByIdOrThrow(Long userId) {
+        return userRepository.get(userId).orElseThrow(() -> new NotFoundException("Not found user ID=" + userId));
+    }
 }
 
