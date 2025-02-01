@@ -106,5 +106,8 @@ public class BaseFilmService implements FilmService {
         return filmRepository.findCommonFilms(userId, friendId);
     }
 
+    public List<Film> getPopularFilms(int count, Integer genreId, Integer year) {
+        return filmRepository.findPopularFilms(count, genreId, year);
+    }
 }
 
