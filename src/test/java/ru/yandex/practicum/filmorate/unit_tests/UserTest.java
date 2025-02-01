@@ -84,4 +84,4 @@ public class UserTest {
         Set<ConstraintViolation<User>> violations = validator.validate(user, Create.class);
         assertTrue(violations.isEmpty());
     }
-}
+} //test
