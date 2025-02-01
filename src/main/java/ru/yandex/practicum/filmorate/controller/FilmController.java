@@ -79,7 +79,7 @@ public class FilmController {
         filmService.deleteLike(id, userId);
     }
 
-    @GetMapping("/top-liked")
+    @GetMapping("/popular")
     @ResponseStatus(HttpStatus.OK)
     public List<Film> findBestLiked(@RequestParam(value = "count", defaultValue = "10") @Positive Integer count) {
         return filmService.findBestLiked(count);
