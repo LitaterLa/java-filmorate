@@ -493,8 +493,8 @@ public class JdbcFilmRepository implements FilmRepository {
             GROUP BY film_id
         ) l ON f.id = l.film_id
         LEFT JOIN MPAA m ON f.rating_id = m.id
-        WHERE (:genreId IS NULL OR f.id IN (SELECT film_id FROM film_genres WHERE genre_id = :genreId))
-        AND (:year IS NULL OR YEAR(f.release_date) = :year)
+        WHERE (COALESCE(:genreId, -1) = -1 OR f.id IN (SELECT film_id FROM film_genres WHERE genre_id = :genreId))
+        AND (COALESCE(:year, -1) = -1 OR EXTRACT(YEAR FROM f.release_date) = :year)
         ORDER BY likes DESC
         LIMIT :count
     """;
