@@ -12,4 +12,6 @@ public interface FilmService {
     void delete(Long filmId);
 
     List<Film> findMostPopularFilms(Integer count, Integer genreId, Integer year);
+
+    void loadGenresForFilms(List<Film> films);
 }

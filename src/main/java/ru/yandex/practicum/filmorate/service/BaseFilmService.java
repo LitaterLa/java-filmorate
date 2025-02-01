@@ -9,10 +9,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.UserEvent;
 import ru.yandex.practicum.filmorate.repository.impl.*;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -109,8 +106,27 @@ public class BaseFilmService implements FilmService {
     }
 
     @Override
+    public void loadGenresForFilms(List<Film> films) {
+        if (films == null || films.isEmpty()) {
+            return;
+        }
+
+        Map<Long, Set<Genre>> genresByFilmId = genreRepository.getGenresByFilmIds(
+                films.stream()
+                        .map(Film::getId)
+                        .collect(Collectors.toSet())
+        );
+
+        for (Film film : films) {
+            film.setGenres(new LinkedHashSet<>(genresByFilmId.getOrDefault(film.getId(), Set.of())));
+        }
+    }
+
+    @Override
     public List<Film> findMostPopularFilms(Integer count, Integer genreId, Integer year) {
-        return filmRepository.findMostPopularFilms(count, genreId, year);
+        List<Film> films = filmRepository.findMostPopularFilms(count, genreId, year);
+        loadGenresForFilms(films);
+        return films;
     }
 }
 
