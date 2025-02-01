@@ -48,14 +48,13 @@ public class SearchRepositoryImpl implements SearchRepository {
                 "LEFT JOIN film_directors fd ON f.id = fd.film_id " +
                 "LEFT JOIN directors d ON fd.director_id = d.id " +
                 validateWhereRequest(query, searchBy) +
-                "GROUP BY f.name " +
+                "GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rating_id, m.id, m.name, g.id, g.name, d.id, d.name " +
                 "ORDER BY film_likes DESC";
 
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("query", query.toLowerCase());
+        params.addValue("query", "%" + query.toLowerCase() + "%");
 
         Map<Long, Film> resultingFilms = new HashMap<>();
-
         jdbc.query(searchQuery, params, rs -> {
             Long filmId = rs.getLong("film_id");
             Film film = resultingFilms.get(filmId);
@@ -66,6 +65,7 @@ public class SearchRepositoryImpl implements SearchRepository {
                 mpaa.setName(rs.getString("mpa_name"));
                 film.setMpa(mpaa);
                 film.setGenres(new LinkedHashSet<>());
+                film.setDirectors(new LinkedHashSet<>());
                 resultingFilms.put(filmId, film);
             }
             Integer genreId = rs.getObject("genre_id", Integer.class);
@@ -84,20 +84,18 @@ public class SearchRepositoryImpl implements SearchRepository {
         return new ArrayList<>(resultingFilms.values());
     }
 
-
-
     private String validateWhereRequest(String query, String searchBy) {
         List<String> searchParams = List.of(searchBy.split(","));
         if (searchParams.size() == 1) {
             if (searchParams.get(0).equalsIgnoreCase("director")) {
-                return "WHERE LOWER(d.name) LIKE LOWER('% " + query + "%') ";
+                return "WHERE LOWER(d.name) LIKE :query ";
             } else if (searchParams.get(0).equalsIgnoreCase("title")) {
-                return "WHERE LOWER(f.name) LIKE LOWER('% " + query + "%') ";
+                return "WHERE LOWER(f.name) LIKE :query ";
             }
         } else if (searchParams.size() == 2) {
-            return "WHERE LOWER(d.name) LIKE LOWER('% " + query + "%') OR  LOWER(f.name) LIKE LOWER('%  + query + %') ";
+            return "WHERE LOWER(d.name) LIKE :query OR LOWER(f.name) LIKE :query ";
         } else {
-            throw new ValidationException("Были заданы неверные параметры");
+            throw new ValidationException("Invalid parameters");
         }
         return "";
     }
