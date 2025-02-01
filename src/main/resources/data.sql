@@ -20,3 +20,4 @@ INSERT INTO EVENTS_OPERATIONS (EVENT_OPERATION_NAME)
     VALUES ('REMOVE'),
            ('ADD'),
            ('UPDATE');
+
