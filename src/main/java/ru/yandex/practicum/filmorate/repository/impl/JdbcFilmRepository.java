@@ -8,9 +8,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.repository.FilmRepository;
+import ru.yandex.practicum.filmorate.repository.GenreRepository;
 import ru.yandex.practicum.filmorate.repository.mappers.DirectorRowMapper;
 import ru.yandex.practicum.filmorate.repository.mappers.FilmRowMapper;
 import ru.yandex.practicum.filmorate.repository.mappers.GenreRowMapper;
@@ -28,6 +30,7 @@ public class JdbcFilmRepository implements FilmRepository {
     private final FilmRowMapper mapper;
     private final GenreRowMapper genreMapper;
     private final DirectorRowMapper directorRowMapper;
+    private final GenreRepository genreRepository;
 
     @Override
     public Collection<Film> getAll() {
@@ -483,49 +486,61 @@ public class JdbcFilmRepository implements FilmRepository {
 
     @Override
     public List<Film> findPopularFilms(int count, Integer genreId, Integer year) {
-        StringBuilder query = new StringBuilder("""
-        SELECT f.id AS film_id, f.name AS film_name, f.description AS film_description,
-               f.release_date AS film_release_date, f.duration AS film_duration,
-               f.rating_id AS film_rating_id, m.name AS rating_name,
-               STRING_AGG(g.name, ', ') AS genres, COUNT(l.user_id) AS like_count
-        FROM films f
-        LEFT JOIN likes l ON f.id = l.film_id
-        JOIN MPAA m ON f.rating_id = m.id
-        LEFT JOIN film_genres fg ON f.id = fg.film_id
-        LEFT JOIN genres g ON fg.genre_id = g.id
-        WHERE 1=1
-    """);
+        String sql = """
+                SELECT f.id, f.name, f.description, f.release_date, f.duration, 
+                       f.rating_id, m.name AS rating_name, 
+                       COALESCE(STRING_AGG(DISTINCT g.id || ':' || g.name, ','), '') AS genres, 
+                       COUNT(DISTINCT l.user_id) AS like_count
+                FROM films f
+                LEFT JOIN likes l ON f.id = l.film_id
+                JOIN MPAA m ON f.rating_id = m.id
+                LEFT JOIN film_genres fg ON f.id = fg.film_id
+                LEFT JOIN genres g ON fg.genre_id = g.id
+                WHERE 1=1
+                """;
 
-        MapSqlParameterSource params = new MapSqlParameterSource();
+        List<Object> params = new ArrayList<>();
 
         if (genreId != null) {
-            query.append(" AND fg.genre_id = :genreId");
-            params.addValue("genreId", genreId);
+            sql += " AND fg.genre_id = ?";
+            params.add(genreId);
         }
 
         if (year != null) {
-            query.append(" AND EXTRACT(YEAR FROM f.release_date) = :year");
-            params.addValue("year", year);
+            sql += " AND EXTRACT(YEAR FROM f.release_date) = ?";
+            params.add(year);
         }
 
-        query.append("""
-        GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rating_id, m.name
-        ORDER BY like_count DESC
-        LIMIT :count
-    """);
-        params.addValue("count", count);
+        sql += """
+                GROUP BY f.id, f.name, f.description, f.release_date, f.duration, 
+                         f.rating_id, m.name
+                ORDER BY like_count DESC
+                LIMIT ?
+                """;
+        params.add(count);
 
-        return jdbc.query(query.toString(), params, (rs, rowNum) -> {
-            Film film = mapper.mapFilm(rs);
-            Mpaa mpaa = mapper.mapMpaa(rs);
-            film.setMpa(mpaa);
+        return jdbcTemplate.query(sql, params.toArray(), (rs, rowNum) -> {
+            Film film = new Film();
+            film.setId(rs.getLong("id"));
+            film.setName(rs.getString("name"));
+            film.setDescription(rs.getString("description"));
+            film.setReleaseDate(rs.getDate("release_date").toLocalDate());
+            film.setDuration(rs.getInt("duration"));
 
-            String genres = rs.getString("genres");
-            if (genres != null && !genres.isEmpty()) {
-                List<Genre> genreList = Arrays.stream(genres.split(", "))
-                        .map(genreName -> new Genre(null, genreName))
-                        .collect(Collectors.toList());
-                film.setGenres(new LinkedHashSet<>(genreList));
+            Mpaa mpa = new Mpaa();
+            mpa.setId(rs.getInt("rating_id"));
+            mpa.setName(rs.getString("rating_name"));
+            film.setMpa(mpa);
+
+            String genreString = rs.getString("genres");
+            if (genreString != null && !genreString.isBlank()) {
+                LinkedHashSet<Genre> genres = Arrays.stream(genreString.split(","))
+                        .map(genreInfo -> {
+                            String[] parts = genreInfo.split(":");
+                            return new Genre(Integer.parseInt(parts[0]), parts[1]);
+                        })
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
+                film.setGenres(genres);
             } else {
                 film.setGenres(new LinkedHashSet<>());
             }
