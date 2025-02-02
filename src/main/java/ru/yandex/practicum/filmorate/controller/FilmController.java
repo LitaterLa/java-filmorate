@@ -83,12 +83,6 @@ public class FilmController {
         filmService.deleteLike(id, userId);
     }
 
-    @GetMapping("/popular")
-    @ResponseStatus(HttpStatus.OK)
-    public List<Film> findBestLiked(@RequestParam(value = "count", defaultValue = "10") @Positive Integer count) {
-        return filmService.findBestLiked(count);
-    }
-
     @GetMapping("/director/{directorId}")
     public Collection<Film> getFilmsByDirector(@PathVariable Long directorId,
                                                @RequestParam String sortBy) {
@@ -109,7 +103,7 @@ public class FilmController {
         return filmService.searchFilm(query, searchBy);
     }
 
-    @GetMapping("/films/popular")
+    @GetMapping("/popular")
     @ResponseStatus(HttpStatus.OK)
     public List<Film> getMostPopularFilms(
             @RequestParam(value = "count", defaultValue = "10") @Positive Integer count,

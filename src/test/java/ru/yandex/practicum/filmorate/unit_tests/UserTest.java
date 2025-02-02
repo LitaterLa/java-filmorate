@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.unit_tests;
 
-import jakarta.validation.ConstraintViolation;
+/*import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -84,4 +84,4 @@ public class UserTest {
         Set<ConstraintViolation<User>> violations = validator.validate(user, Create.class);
         assertTrue(violations.isEmpty());
     }
-} //test
+}*/

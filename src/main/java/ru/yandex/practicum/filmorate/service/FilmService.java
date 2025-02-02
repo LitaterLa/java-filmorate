@@ -14,4 +14,6 @@ public interface FilmService {
     List<Film> findMostPopularFilms(Integer count, Integer genreId, Integer year);
 
     void loadGenresForFilms(List<Film> films);
+
+    void loadDirectorsForFilms(List<Film> films);
 }
