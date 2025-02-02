@@ -46,6 +46,10 @@ public class ReviewServiceImpl implements ReviewService {
         return repository.getById(id).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
     }
 
+    public List<Review> getAll() {
+        return repository.getAllReviews();
+    }
+
     @Override
     public List<Review> getReviewsByFilmId(Optional<Long> filmId, Integer count) {
         filmId.ifPresent(filmService::getFilmByIdOrThrow);
