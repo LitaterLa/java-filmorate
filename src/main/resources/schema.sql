@@ -51,7 +51,8 @@ film_id  INTEGER   NOT NULL      REFERENCES films (id) ON delete CASCADE
 
 create TABLE IF NOT EXISTS likes (
 film_id INTEGER REFERENCES films (id) ON delete CASCADE,
-user_id INTEGER REFERENCES users (id) ON delete CASCADE
+user_id INTEGER REFERENCES users (id) ON delete CASCADE,
+PRIMARY KEY (film_id, user_id)
 );
 
 create TABLE IF NOT EXISTS friends (

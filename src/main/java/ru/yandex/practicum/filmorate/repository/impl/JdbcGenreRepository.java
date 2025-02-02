@@ -10,8 +10,10 @@ import ru.yandex.practicum.filmorate.repository.GenreRepository;
 import ru.yandex.practicum.filmorate.repository.mappers.GenreRowMapper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Repository
@@ -44,4 +46,20 @@ public class JdbcGenreRepository implements GenreRepository {
         return jdbc.query(sqlQuery, new MapSqlParameterSource("genreIds", genreIds), mapper);
     }
 
+    public Map<Long, Set<Genre>> getGenresByFilmIds(Set<Long> filmIds) {
+        String sqlQuery = "SELECT fg.film_id, g.id, g.name " +
+                "FROM film_genres fg " +
+                "JOIN genres g ON fg.genre_id = g.id " +
+                "WHERE fg.film_id IN (:filmIds)";
+
+        return jdbc.query(sqlQuery, new MapSqlParameterSource("filmIds", filmIds), (rs, rowNum) -> {
+                    long filmId = rs.getLong("film_id");
+                    Genre genre = new Genre(rs.getInt("id"), rs.getString("name"));
+                    return Map.entry(filmId, genre);
+                }).stream()
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
+                ));
+    }
 }

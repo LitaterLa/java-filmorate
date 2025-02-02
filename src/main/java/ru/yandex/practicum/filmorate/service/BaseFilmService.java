@@ -1,20 +1,17 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.UserEvent;
+import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.repository.DirectorRepository;
 import ru.yandex.practicum.filmorate.repository.impl.*;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BaseFilmService implements FilmService {
@@ -24,6 +21,7 @@ public class BaseFilmService implements FilmService {
     private final JdbcGenreRepository genreRepository;
     private final EventService eventService;
     private final SearchRepositoryImpl searchRepository;
+    private final DirectorRepository directorRepository;
 
     public Film save(Film film) {
         mpaaRepository.getById(film.getMpa().getId())
@@ -106,6 +104,54 @@ public class BaseFilmService implements FilmService {
 
     private User getUserByIdOrThrow(Long userId) {
         return userRepository.get(userId).orElseThrow(() -> new NotFoundException("Not found user ID=" + userId));
+    }
+
+    @Override
+    public void loadGenresForFilms(List<Film> films) {
+        if (films == null || films.isEmpty()) {
+            return;
+        }
+
+        Map<Long, Set<Genre>> genresByFilmId = genreRepository.getGenresByFilmIds(
+                films.stream()
+                        .map(Film::getId)
+                        .collect(Collectors.toSet())
+        );
+
+        for (Film film : films) {
+            film.setGenres(new LinkedHashSet<>(genresByFilmId.getOrDefault(film.getId(), new LinkedHashSet<>())));
+        }
+    }
+
+    @Override
+    public List<Film> findMostPopularFilms(Integer count, Integer genreId, Integer year) {
+        log.info("Запрос популярных фильмов с фильтрацией: count={}, genreId={}, year={}", count, genreId, year);
+
+        List<Film> films = filmRepository.findMostPopularFilms(count, genreId, year);
+
+        if (!films.isEmpty()) {
+            loadGenresForFilms(films);
+            loadDirectorsForFilms(films);
+        }
+
+        log.info("Фильмы после загрузки жанров и режиссёров: {}", films);
+
+        return films;
+    }
+
+    @Override
+    public void loadDirectorsForFilms(List<Film> films) {
+        if (films == null || films.isEmpty()) {
+            return;
+        }
+
+        Map<Long, Set<Director>> directorsByFilmId = directorRepository.getDirectorsByFilmIds(
+                films.stream().map(Film::getId).collect(Collectors.toSet())
+        );
+
+        for (Film film : films) {
+            film.setDirectors(new LinkedHashSet<>(directorsByFilmId.getOrDefault(film.getId(), new LinkedHashSet<>())));
+        }
     }
 }
 
