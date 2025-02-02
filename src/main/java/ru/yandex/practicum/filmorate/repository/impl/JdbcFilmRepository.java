@@ -160,6 +160,8 @@ public class JdbcFilmRepository implements FilmRepository {
             throw new ValidationException("У фильма должен быть рейтинг");
         }
 
+        film.setId(null);
+
         String sqlQuery = "INSERT INTO films (name, description, release_date, duration, rating_id) " +
                 "VALUES (:name, :description, :releaseDate, :duration, :ratingId)";
 
@@ -479,5 +481,100 @@ public class JdbcFilmRepository implements FilmRepository {
                     film.setMpa(mpaa);
                     return film;
                 });
+    }
+
+    @Override
+    public List<Film> findMostPopularFilms(Integer count, Integer genreId, Integer year) {
+        String sql = """
+        SELECT f.id AS film_id, f.name AS film_name, f.description, f.release_date, f.duration, f.rating_id,
+               COALESCE(l.like_count, 0) AS likes,
+               m.id AS rating_id, m.name AS rating_name
+        FROM films f
+        LEFT JOIN (
+            SELECT film_id, COUNT(user_id) AS like_count
+            FROM likes
+            GROUP BY film_id
+        ) l ON f.id = l.film_id
+        LEFT JOIN MPAA m ON f.rating_id = m.id
+        LEFT JOIN film_genres fg ON fg.film_id = f.id
+        WHERE (:genreId IS NULL OR f.id IN (
+            SELECT film_id FROM film_genres WHERE genre_id = :genreId
+        ))
+          AND (:year IS NULL OR EXTRACT(YEAR FROM f.release_date) = :year)
+        GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rating_id, m.id, m.name, l.like_count
+        ORDER BY likes DESC, f.release_date DESC
+        LIMIT :count
+    """;
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("count", count)
+                .addValue("genreId", genreId)
+                .addValue("year", year);
+
+        return jdbc.query(sql, params, (rs, rowNum) -> {
+            Film film = mapper.mapFilm(rs);
+            Mpaa mpaa = mapper.mapMpaa(rs);
+            film.setMpa(mpaa);
+            return film;
+        });
+    }
+
+    private void loadGenresForFilms(List<Film> films, List<Long> filmIds) {
+        if (filmIds.isEmpty()) {
+            return;
+        }
+
+        String genreQuery = """
+    SELECT fg.film_id AS film_id, g.id AS genre_id, g.name AS genre_name
+    FROM film_genres fg
+    JOIN genres g ON fg.genre_id = g.id
+    WHERE fg.film_id IN (:filmIds)
+    ORDER BY g.id
+    """;
+
+        MapSqlParameterSource params = new MapSqlParameterSource("filmIds", filmIds);
+        List<Map<String, Object>> genreResults = jdbc.queryForList(genreQuery, params);
+
+        Map<Long, Set<Genre>> genresByFilmId = new HashMap<>();
+        for (Map<String, Object> row : genreResults) {
+            long filmId = ((Number) row.get("film_id")).longValue();
+            Genre genre = new Genre(((Number) row.get("genre_id")).intValue(), (String) row.get("genre_name"));
+            genresByFilmId.computeIfAbsent(filmId, k -> new LinkedHashSet<>()).add(genre);
+        }
+
+        for (Film film : films) {
+            film.setGenres(new LinkedHashSet<>(genresByFilmId.getOrDefault(film.getId(), new LinkedHashSet<>())));
+        }
+    }
+
+    private void loadDirectorsForFilms(List<Film> films, List<Long> filmIds) {
+        if (filmIds.isEmpty()) {
+            return;
+        }
+
+        String directorQuery = """
+    SELECT fd.film_id AS film_id, d.id AS director_id, d.name AS director_name
+    FROM film_directors fd
+    JOIN directors d ON fd.director_id = d.id
+    WHERE fd.film_id IN (:filmIds)
+    ORDER BY d.id
+    """;
+
+        MapSqlParameterSource params = new MapSqlParameterSource("filmIds", filmIds);
+        List<Map<String, Object>> directorResults = jdbc.queryForList(directorQuery, params);
+
+        Map<Long, Set<Director>> directorsByFilmId = new HashMap<>();
+        for (Map<String, Object> row : directorResults) {
+            long filmId = ((Number) row.get("film_id")).longValue();
+            long directorId = ((Number) row.get("director_id")).longValue();
+            String directorName = (String) row.get("director_name");
+
+            Director director = new Director(directorId, directorName);
+            directorsByFilmId.computeIfAbsent(filmId, k -> new LinkedHashSet<>()).add(director);
+        }
+
+        for (Film film : films) {
+            film.setDirectors(new LinkedHashSet<>(directorsByFilmId.getOrDefault(film.getId(), new LinkedHashSet<>())));
+        }
     }
 }

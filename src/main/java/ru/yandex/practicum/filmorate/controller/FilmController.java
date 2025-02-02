@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.BaseFilmService;
 import ru.yandex.practicum.filmorate.validation.Create;
@@ -35,6 +36,9 @@ public class FilmController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film save(@Validated(Create.class) @RequestBody Film film) {
+        if (film.getId() != null) {
+            throw new ValidationException("ID фильма должен быть пустым при создании.");
+        }
         Film savedFilm = filmService.save(film);
         log.info("сохранение фильма {} ID {}", savedFilm.getName(), savedFilm.getId());
         return savedFilm;
@@ -79,12 +83,6 @@ public class FilmController {
         filmService.deleteLike(id, userId);
     }
 
-    @GetMapping("/popular")
-    @ResponseStatus(HttpStatus.OK)
-    public List<Film> findBestLiked(@RequestParam(value = "count", defaultValue = "10") @Positive Integer count) {
-        return filmService.findBestLiked(count);
-    }
-
     @GetMapping("/director/{directorId}")
     public Collection<Film> getFilmsByDirector(@PathVariable Long directorId,
                                                @RequestParam String sortBy) {
@@ -105,6 +103,15 @@ public class FilmController {
         return filmService.searchFilm(query, searchBy);
     }
 
+    @GetMapping("/popular")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Film> getMostPopularFilms(
+            @RequestParam(value = "count", defaultValue = "10") @Positive Integer count,
+            @RequestParam(value = "genreId", required = false) Integer genreId,
+            @RequestParam(value = "year", required = false) Integer year) {
+        log.info("Запрос топ-{} популярных фильмов с фильтрацией по жанру={} и году={}", count, genreId, year);
+        return filmService.findMostPopularFilms(count, genreId, year);
+    }
 }
 
 

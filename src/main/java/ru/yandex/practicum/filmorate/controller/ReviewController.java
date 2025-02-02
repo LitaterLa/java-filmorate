@@ -97,5 +97,4 @@ public class ReviewController {
         log.info("удаление дизлайка отзыву id {}", userId);
         service.removeLike(id, userId);
     }
-
 }

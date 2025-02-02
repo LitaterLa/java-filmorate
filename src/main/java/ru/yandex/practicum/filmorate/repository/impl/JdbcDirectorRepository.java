@@ -12,8 +12,8 @@ import ru.yandex.practicum.filmorate.repository.DirectorRepository;
 import ru.yandex.practicum.filmorate.repository.mappers.DirectorRowMapper;
 
 import java.sql.PreparedStatement;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Repository
@@ -79,5 +79,35 @@ public class JdbcDirectorRepository implements DirectorRepository {
             statement.setLong(1, id);
             return statement;
         }, keyHolder);
+    }
+
+    @Override
+    public Map<Long, Set<Director>> getDirectorsByFilmIds(Set<Long> filmIds) {
+        if (filmIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        String sqlQuery = String.format("""
+        SELECT fd.film_id, d.id AS director_id, d.name AS director_name
+        FROM film_directors fd
+        JOIN directors d ON fd.director_id = d.id
+        WHERE fd.film_id IN (%s)
+    """, filmIds.stream().map(id -> "?").collect(Collectors.joining(", ")));
+
+        Object[] params = filmIds.toArray();
+
+        List<Map.Entry<Long, Director>> result = jdbc.query(sqlQuery, params, (rs, rowNum) -> {
+            Long filmId = rs.getLong("film_id");
+            Long directorId = rs.getLong("director_id");
+            String directorName = rs.getString("director_name");
+            Director director = new Director(directorId, directorName);
+            return Map.entry(filmId, director);
+        });
+
+        return result.stream()
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
+                ));
     }
 }

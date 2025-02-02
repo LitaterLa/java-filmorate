@@ -22,5 +22,4 @@ public class GenreService implements BaseGenreService {
     public List<Genre> getAllGenres() {
         return genreRepository.getAll();
     }
-
 }
