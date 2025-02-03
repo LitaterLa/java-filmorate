@@ -36,6 +36,7 @@ public class JdbcReviewRepository implements ReviewRepository {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbc.update(query, params, keyHolder);
+
         review.setReviewId(Objects.requireNonNull(keyHolder.getKey().intValue()));
         return review;
     }
@@ -44,6 +45,11 @@ public class JdbcReviewRepository implements ReviewRepository {
     public void delete(Integer id) {
         String query = "DELETE FROM reviews WHERE review_id = :id";
         jdbc.update(query, new MapSqlParameterSource().addValue("id", id));
+    }
+
+    public List<Review> getAllReviews() {
+        String sql = "SELECT * FROM reviews ORDER BY useful DESC";
+        return jdbc.query(sql, mapper);
     }
 
     @Override
@@ -88,10 +94,14 @@ public class JdbcReviewRepository implements ReviewRepository {
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("count", count);
-        filmId.ifPresent(id -> params.addValue("filmId", id));
+
+        if (filmId.isPresent()) {
+            params.addValue("filmId", filmId.get());
+        }
 
         return jdbc.query(query, params, mapper);
     }
+
 
     @Override
     public void addLike(Integer reviewId, Long userId) {

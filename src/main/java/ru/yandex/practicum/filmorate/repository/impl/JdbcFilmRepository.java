@@ -86,21 +86,8 @@ public class JdbcFilmRepository implements FilmRepository {
 
         films.forEach(film -> {
             film.setGenres(new LinkedHashSet<>(mappedGenres.getOrDefault(film.getId(), Set.of())));
-
-            if (film.getGenres() == null) {
-                film.setGenres(new LinkedHashSet<>());
-            }
-            Mpaa filmRating = Optional.ofNullable(film.getMpa())
-                    .map(Mpaa::getId)
-                    .map(ratingId -> new Mpaa(ratingId, "Unknown"))
-                    .orElse(new Mpaa(0, "Unknown"));
-            film.setMpa(filmRating);
-
             film.setDirectors(new LinkedHashSet<>(mappedDirectors.getOrDefault(film.getId(), Set.of())));
 
-            if (film.getDirectors() == null) {
-                film.setDirectors(new LinkedHashSet<>());
-            }
         });
 
         return films;
@@ -241,20 +228,52 @@ public class JdbcFilmRepository implements FilmRepository {
 
     @Override
     public List<Film> findBestLiked(Integer count) {
-        String query = "SELECT f.id AS film_id, f.name AS film_name, f.description AS description, " +
+        String filmQuery = "SELECT f.id AS film_id, f.name AS film_name, f.description AS description, " +
                 "f.release_date AS release_date, f.duration AS duration, f.rating_id AS rating_id, " +
                 "m.name AS rating_name, COUNT(l.user_id) AS like_count " +
-                "FROM films f LEFT JOIN likes l ON f.id = l.film_id " +
+                "FROM films f " +
+                "LEFT JOIN likes l ON f.id = l.film_id " +
                 "JOIN MPAA m ON f.rating_id = m.id " +
                 "GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rating_id, m.name " +
                 "ORDER BY like_count DESC LIMIT :count";
 
-        return jdbc.query(query, new MapSqlParameterSource("count", count), (rs, rowNum) -> {
+        List<Film> films = jdbc.query(filmQuery, new MapSqlParameterSource("count", count), (rs, rowNum) -> {
             Film film = mapper.mapFilm(rs);
             Mpaa mpaa = mapper.mapMpaa(rs);
             film.setMpa(mpaa);
             return film;
         });
+
+        if (films.isEmpty()) {
+            return films;
+        }
+
+        List<Long> filmIds = films.stream().map(Film::getId).collect(Collectors.toList());
+
+        String genreQuery = "SELECT fg.film_id as film_id, g.id AS genre_id, g.name AS genre_name " +
+                "FROM film_genres fg " +
+                "JOIN genres g ON fg.genre_id = g.id " +
+                "WHERE fg.film_id IN (:filmIds)";
+
+        MapSqlParameterSource genreParams = new MapSqlParameterSource("filmIds", filmIds);
+        List<Map<String, Object>> genreResults = jdbc.queryForList(genreQuery, genreParams);
+
+        Map<Long, Set<Genre>> filmGenres = new HashMap<>();
+        for (Map<String, Object> row : genreResults) {
+            Long filmId = ((Number) row.get("film_id")).longValue();
+            Integer genreId = (Integer) row.get("genre_id");
+            String genreName = (String) row.get("genre_name");
+
+            filmGenres.computeIfAbsent(filmId, k -> new LinkedHashSet<>())
+                    .add(new Genre(genreId, genreName));
+        }
+
+        films.forEach(film -> {
+            LinkedHashSet<Genre> genres = (LinkedHashSet<Genre>) filmGenres.getOrDefault(film.getId(), new LinkedHashSet<>());
+            film.setGenres(genres);
+        });
+
+        return films;
     }
 
     private void removeLikeFilm(Long id) {
@@ -394,13 +413,8 @@ public class JdbcFilmRepository implements FilmRepository {
             if (film.getDirectors() == null) {
                 film.setDirectors(new LinkedHashSet<>());
             }
-
-            Mpaa filmRating = Optional.ofNullable(film.getMpa())
-                    .map(Mpaa::getId)
-                    .map(ratingId -> new Mpaa(ratingId, "Unknown"))
-                    .orElse(new Mpaa(0, "Unknown"));
-            film.setMpa(filmRating);
         });
+
 
         return films;
     }
@@ -474,13 +488,44 @@ public class JdbcFilmRepository implements FilmRepository {
                 "WHERE l1.USER_ID = :userId AND l2.USER_ID <> :userId GROUP BY l2.USER_ID) " +
                 " AND l.FILM_ID NOT IN (SELECT lk.FILM_ID FROM LIKES lk WHERE lk.USER_ID = :userId))";
 
-        return jdbc.query(filmQuery, new MapSqlParameterSource().addValue("userId", userId),
+        List<Film> films = jdbc.query(filmQuery, new MapSqlParameterSource().addValue("userId", userId),
                 (rs, rowNum) -> {
                     Film film = mapper.mapFilm(rs);
                     Mpaa mpaa = mapper.mapMpaa(rs);
                     film.setMpa(mpaa);
                     return film;
                 });
+
+        if (films.isEmpty()) {
+            return films;
+        }
+
+        List<Long> filmIds = films.stream().map(Film::getId).collect(Collectors.toList());
+
+        String genreQuery = "SELECT fg.film_id as film_id, g.id AS genre_id, g.name AS genre_name " +
+                "FROM film_genres fg " +
+                "JOIN genres g ON fg.genre_id = g.id " +
+                "WHERE fg.film_id IN (:filmIds)";
+
+        MapSqlParameterSource genreParams = new MapSqlParameterSource("filmIds", filmIds);
+        List<Map<String, Object>> genreResults = jdbc.queryForList(genreQuery, genreParams);
+
+        Map<Long, Set<Genre>> filmGenres = new HashMap<>();
+        for (Map<String, Object> row : genreResults) {
+            Long filmId = ((Number) row.get("film_id")).longValue();
+            Integer genreId = (Integer) row.get("genre_id");
+            String genreName = (String) row.get("genre_name");
+
+            filmGenres.computeIfAbsent(filmId, k -> new LinkedHashSet<>())
+                    .add(new Genre(genreId, genreName));
+        }
+
+        films.forEach(film -> {
+            LinkedHashSet<Genre> genres = (LinkedHashSet<Genre>) filmGenres.getOrDefault(film.getId(), new LinkedHashSet<>());
+            film.setGenres(genres);
+        });
+
+        return films;
     }
 
     @Override

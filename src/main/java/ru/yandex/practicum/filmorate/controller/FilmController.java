@@ -52,7 +52,7 @@ public class FilmController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Film getFilm(@PathVariable @Positive Long id) {
+    public Film getFilm(@PathVariable Long id) {
         return filmService.getFilmByIdOrThrow(id);
     }
 
@@ -66,20 +66,20 @@ public class FilmController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable @Positive Long id) {
+    public void delete(@PathVariable Long id) {
         log.info("Удаление фильма ID {}", id);
         filmService.delete(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public void addLike(@PathVariable @Positive Long id,
-                        @PathVariable @Positive Long userId) {
+    public void addLike(@PathVariable Long id,
+                        @PathVariable Long userId) {
         filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public void deleteLike(@PathVariable @Positive Long id,
-                           @PathVariable @Positive Long userId) {
+    public void deleteLike(@PathVariable Long id,
+                           @PathVariable Long userId) {
         filmService.deleteLike(id, userId);
     }
 
@@ -91,8 +91,8 @@ public class FilmController {
 
     @GetMapping("/common")
     @ResponseStatus(HttpStatus.OK)
-    public List<Film> getCommonFilms(@RequestParam @Positive Long userId,
-                                     @RequestParam @Positive Long friendId) {
+    public List<Film> getCommonFilms(@RequestParam Long userId,
+                                     @RequestParam Long friendId) {
         log.info("Запрос общих фильмов для пользователей userId={} и friendId={}", userId, friendId);
         return filmService.getCommonFilms(userId, friendId);
     }

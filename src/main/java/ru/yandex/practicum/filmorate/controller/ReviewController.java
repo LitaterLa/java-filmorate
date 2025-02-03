@@ -60,6 +60,12 @@ public class ReviewController {
         return service.getById(id);
     }
 
+//    @GetMapping
+//    @ResponseStatus(HttpStatus.OK)
+//    public List<Review> getAll() {
+//        return service.getAll();
+//    }
+
     @GetMapping
     public List<Review> getReviewsByFilm(
             @RequestParam(value = "filmId", required = false) Long filmId,
