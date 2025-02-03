@@ -13,10 +13,12 @@ import ru.yandex.practicum.filmorate.repository.SearchRepository;
 import ru.yandex.practicum.filmorate.repository.mappers.FilmRowMapper;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Repository
@@ -81,7 +83,9 @@ public class SearchRepositoryImpl implements SearchRepository {
                 film.getDirectors().add(director);
             }
         });
-        return new ArrayList<>(resultingFilms.values());
+        return new ArrayList<>(resultingFilms.values().stream().sorted(Comparator.comparing(Film::getId)
+                        .reversed())
+                .collect(Collectors.toList()));
     }
 
     private String validateWhereRequest(String query, String searchBy) {
