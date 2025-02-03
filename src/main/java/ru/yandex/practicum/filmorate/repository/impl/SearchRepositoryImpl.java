@@ -82,6 +82,9 @@ public class SearchRepositoryImpl implements SearchRepository {
             }
         });
         return new ArrayList<>(resultingFilms.values());
+//        return new ArrayList<>(resultingFilms.values().stream().sorted(Comparator.comparing(Film::getId)
+//                        .reversed())
+//                .collect(Collectors.toList()));
     }
 
     private String validateWhereRequest(String query, String searchBy) {

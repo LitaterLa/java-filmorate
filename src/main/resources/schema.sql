@@ -1,5 +1,5 @@
 drop TABLE IF EXISTS users, films, MPAA, genres, film_genres, likes, friends, friendship_status,
-reviews, review_reactions, film_directors, directors CASCADE;
+reviews, review_reactions, film_directors, directors, USER_EVENTS, EVENTS_TYPES, EVENTS_OPERATIONS CASCADE;
 
 create TABLE IF NOT EXISTS MPAA (
     id INTEGER PRIMARY KEY,
@@ -51,8 +51,7 @@ film_id  INTEGER   NOT NULL      REFERENCES films (id) ON delete CASCADE
 
 create TABLE IF NOT EXISTS likes (
 film_id INTEGER REFERENCES films (id) ON delete CASCADE,
-user_id INTEGER REFERENCES users (id) ON delete CASCADE,
-PRIMARY KEY (film_id, user_id)
+user_id INTEGER REFERENCES users (id) ON delete CASCADE
 );
 
 create TABLE IF NOT EXISTS friends (
@@ -105,3 +104,4 @@ CREATE TABLE IF NOT EXISTS EVENTS_OPERATIONS
     EVENT_OPERATION_NAME VARCHAR NOT NULL,
     CONSTRAINT EVENT_OPERATIONS_PK PRIMARY KEY (EVENT_OPERATION_ID)
 );
+

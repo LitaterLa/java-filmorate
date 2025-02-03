@@ -2,11 +2,13 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.repository.DirectorRepository;
 
 import java.util.Collection;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +29,9 @@ public class DirectorService {
     }
 
     public Director createDirector(Director director) {
+        if (Objects.equals(director.getName(), " ")) {
+            throw new InternalServerException("Некорректные данные!");
+        }
         return directorRepository.save(director);
     }
 
