@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.repository.ReviewRepository;
 import ru.yandex.practicum.filmorate.repository.mappers.ReviewRowMapper;
-import ru.yandex.practicum.filmorate.service.EventService;
 
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -95,9 +94,7 @@ public class JdbcReviewRepository implements ReviewRepository {
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("count", count);
 
-        if (filmId.isPresent()) {
-            params.addValue("filmId", filmId.get());
-        }
+        filmId.ifPresent(aLong -> params.addValue("filmId", aLong));
 
         return jdbc.query(query, params, mapper);
     }
