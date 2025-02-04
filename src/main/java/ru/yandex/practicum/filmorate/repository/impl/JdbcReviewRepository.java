@@ -24,8 +24,6 @@ public class JdbcReviewRepository implements ReviewRepository {
     private final JdbcTemplate jdbcTemplate;
     private final ReviewRowMapper mapper;
 
-    private final EventService eventService;
-
     @Override
     public Review save(Review review) {
         KeyHolder keyHolder = new GeneratedKeyHolder();

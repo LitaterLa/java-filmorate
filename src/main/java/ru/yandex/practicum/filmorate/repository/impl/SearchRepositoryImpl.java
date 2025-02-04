@@ -43,7 +43,7 @@ public class SearchRepositoryImpl implements SearchRepository {
                 "LEFT JOIN genres g ON fg.genre_id = g.id " +
                 "LEFT JOIN film_directors fd ON f.id = fd.film_id " +
                 "LEFT JOIN directors d ON fd.director_id = d.id " +
-                validateWhereRequest(query, searchBy) +
+                validateWhereRequest(searchBy) +
                 "GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rating_id, m.id, m.name, g.id, g.name, d.id, d.name " +
                 "ORDER BY f.id desc";
 
@@ -78,17 +78,14 @@ public class SearchRepositoryImpl implements SearchRepository {
             }
         });
         return new ArrayList<>(resultingFilms.values());
-        /*return new ArrayList<>(resultingFilms.values().stream().sorted(Comparator.comparing(Film::getId)
-                        .reversed())
-                .collect(Collectors.toList()));*/
     }
 
-    private String validateWhereRequest(String query, String searchBy) {
+    private String validateWhereRequest(String searchBy) {
         List<String> searchParams = List.of(searchBy.split(","));
         if (searchParams.size() == 1) {
-            if (searchParams.get(0).equalsIgnoreCase("director")) {
+            if (searchParams.getFirst().equalsIgnoreCase("director")) {
                 return "WHERE LOWER(d.name) LIKE :query ";
-            } else if (searchParams.get(0).equalsIgnoreCase("title")) {
+            } else if (searchParams.getFirst().equalsIgnoreCase("title")) {
                 return "WHERE LOWER(f.name) LIKE :query ";
             }
         } else if (searchParams.size() == 2) {

@@ -85,10 +85,6 @@ public class BaseFilmService implements FilmService {
         filmRepository.delete(filmId);
     }
 
-    public List<Film> findBestLiked(Integer count) {
-        return filmRepository.findBestLiked(count);
-    }
-
     public Film getFilmByIdOrThrow(Long filmId) {
         return filmRepository.get(filmId).orElseThrow(() -> new NotFoundException("not found film ID=" + filmId));
     }
