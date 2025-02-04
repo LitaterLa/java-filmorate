@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,5 +12,6 @@ import lombok.experimental.FieldDefaults;
 public class Director {
 
     Long id;
+    @NotEmpty
     String name;
 }

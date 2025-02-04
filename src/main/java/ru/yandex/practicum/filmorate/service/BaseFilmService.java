@@ -74,7 +74,11 @@ public class BaseFilmService implements FilmService {
     }
 
     public Collection<Film> getFilmsByDirector(Long directorId, String sortType) {
-        return filmRepository.findByDirector(directorId, sortType);
+        Collection<Film> films = filmRepository.findByDirector(directorId, sortType);
+        if (films.isEmpty()) {
+            throw new NotFoundException("Режиссер не найден!");
+        }
+        return films;
     }
 
     @Override

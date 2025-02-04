@@ -12,11 +12,8 @@ import ru.yandex.practicum.filmorate.model.Mpaa;
 import ru.yandex.practicum.filmorate.repository.SearchRepository;
 import ru.yandex.practicum.filmorate.repository.mappers.FilmRowMapper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Repository
@@ -49,12 +46,12 @@ public class SearchRepositoryImpl implements SearchRepository {
                 "LEFT JOIN directors d ON fd.director_id = d.id " +
                 validateWhereRequest(query, searchBy) +
                 "GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rating_id, m.id, m.name, g.id, g.name, d.id, d.name " +
-                "ORDER BY film_likes DESC";
+                "ORDER BY f.id desc";
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("query", "%" + query.toLowerCase() + "%");
 
-        Map<Long, Film> resultingFilms = new HashMap<>();
+        Map<Long, Film> resultingFilms = new LinkedHashMap<>();
         jdbc.query(searchQuery, params, rs -> {
             Long filmId = rs.getLong("film_id");
             Film film = resultingFilms.get(filmId);
@@ -82,9 +79,9 @@ public class SearchRepositoryImpl implements SearchRepository {
             }
         });
         return new ArrayList<>(resultingFilms.values());
-//        return new ArrayList<>(resultingFilms.values().stream().sorted(Comparator.comparing(Film::getId)
-//                        .reversed())
-//                .collect(Collectors.toList()));
+        /*return new ArrayList<>(resultingFilms.values().stream().sorted(Comparator.comparing(Film::getId)
+                        .reversed())
+                .collect(Collectors.toList()));*/
     }
 
     private String validateWhereRequest(String query, String searchBy) {
