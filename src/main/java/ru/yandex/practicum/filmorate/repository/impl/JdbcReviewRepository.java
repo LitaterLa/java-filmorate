@@ -9,7 +9,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.model.UserEvent;
 import ru.yandex.practicum.filmorate.repository.ReviewRepository;
 import ru.yandex.practicum.filmorate.repository.mappers.ReviewRowMapper;
 import ru.yandex.practicum.filmorate.service.EventService;
@@ -45,20 +44,6 @@ public class JdbcReviewRepository implements ReviewRepository {
 
         review.setReviewId((Integer) keyHolder.getKey());
         return review;
-
-        /*MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("content", review.getContent())
-                .addValue("is_positive", review.getIsPositive())
-                .addValue("user_id", review.getUserId())
-                .addValue("film_id", review.getFilmId())
-                .addValue("useful", review.getUseful() != null ? review.getUseful() : 0);
-
-        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-
-        jdbc.update(query, params, keyHolder);
-
-        review.setReviewId(Objects.requireNonNull(keyHolder.getKey().intValue()));
-        return review;*/
     }
 
     @Override
@@ -87,19 +72,6 @@ public class JdbcReviewRepository implements ReviewRepository {
         }, keyHolder);
 
         return getById(review.getReviewId()).orElseThrow();
-
-        /*MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("review_id", review.getReviewId())
-                .addValue("user_id", review.getUserId())
-                .addValue("film_id", review.getFilmId())
-                .addValue("is_positive", review.getIsPositive(), Types.BOOLEAN)
-                .addValue("content", review.getContent())
-                .addValue("useful", review.getUseful() != null ? review.getUseful() : 0);
-
-        review.setUseful(review.getUseful() != null ? review.getUseful() : 0);
-
-        jdbc.update(query, params);
-        return review;*/
     }
 
     @Override
@@ -132,7 +104,6 @@ public class JdbcReviewRepository implements ReviewRepository {
         return jdbc.query(query, params, mapper);
     }
 
-
     @Override
     public void addLike(Integer reviewId, Long userId) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -146,11 +117,6 @@ public class JdbcReviewRepository implements ReviewRepository {
                 statement.setLong(2, userId);
                 return statement;
             }, keyHolder);
-
-        /*int removedDislikes = jdbc.update(removeDislikeQuery, new MapSqlParameterSource()
-                .addValue("review_id", reviewId)
-                .addValue("user_id", userId));*/
-
 
             if (removedDislikes > 0) {
                 String increaseUsefulQuery = "UPDATE reviews SET useful = useful + 1 WHERE review_id = ?";
@@ -170,8 +136,6 @@ public class JdbcReviewRepository implements ReviewRepository {
             statement.setLong(2, userId);
             return statement;
         }, keyHolder);
-
-        eventService.createEvent(userId, reviewId, UserEvent.EventType.LIKE, UserEvent.EventOperation.ADD);
 
         String increaseUsefulQuery = "UPDATE reviews SET useful = useful + 1 WHERE review_id = ?";
 
@@ -193,8 +157,6 @@ public class JdbcReviewRepository implements ReviewRepository {
             statement.setLong(2, userId);
             return statement;
         }, keyHolder);
-
-        eventService.createEvent(userId, reviewId, UserEvent.EventType.LIKE, UserEvent.EventOperation.REMOVE);
 
         String queryReview = "UPDATE reviews SET useful = useful - 1 WHERE review_id = ?";
         jdbcTemplate.update(connection -> {
@@ -237,8 +199,6 @@ public class JdbcReviewRepository implements ReviewRepository {
             return statement;
         }, keyHolder);
 
-        eventService.createEvent(userId, reviewId, UserEvent.EventType.LIKE, UserEvent.EventOperation.ADD);
-
         String decreaseUsefulQuery = "UPDATE reviews SET useful = useful - 1 WHERE review_id = ?";
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(decreaseUsefulQuery);
@@ -259,8 +219,6 @@ public class JdbcReviewRepository implements ReviewRepository {
             return statement;
         }, keyHolder);
 
-        eventService.createEvent(userId, reviewId, UserEvent.EventType.LIKE, UserEvent.EventOperation.REMOVE);
-
         String queryReview = "UPDATE reviews SET useful = useful + 1 WHERE review_id = ?";
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(queryReview);
@@ -268,5 +226,4 @@ public class JdbcReviewRepository implements ReviewRepository {
             return statement;
         }, keyHolder);
     }
-
 }

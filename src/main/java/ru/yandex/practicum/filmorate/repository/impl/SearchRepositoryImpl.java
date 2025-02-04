@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.repository.SearchRepository;
 import ru.yandex.practicum.filmorate.repository.mappers.FilmRowMapper;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Repository

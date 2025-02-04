@@ -66,6 +66,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public Set<User> addFriend(@PathVariable Long id,
                                @PathVariable Long friendId) {
+        log.info("Пользователь с id {} добавляет в друзья пользователя с id {}", id, friendId);
         userService.addFriend(id, friendId);
         return userService.getFriends(id);
     }
@@ -75,6 +76,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public Set<User> deleteFriend(@PathVariable Long id,
                                   @PathVariable Long friendId) {
+        log.info("Пользователь с id {} удаляет из друзей пользователя с id {}", id, friendId);
         userService.deleteFriend(id, friendId);
         return userService.getFriends(id);
     }

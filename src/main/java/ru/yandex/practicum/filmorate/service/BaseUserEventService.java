@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.repository.EventRepository;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 
 import java.time.Instant;
-import java.util.Collection;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +24,7 @@ public class BaseUserEventService implements EventService {
         if (userRepository.get(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден!");
         }
+
         return eventRepository.getEventByUser(userId);
     }
 
