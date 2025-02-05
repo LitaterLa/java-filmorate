@@ -6,8 +6,8 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.impl.JdbcFilmRepository;
 import ru.yandex.practicum.filmorate.model.UserEvent;
+import ru.yandex.practicum.filmorate.repository.impl.JdbcFilmRepository;
 import ru.yandex.practicum.filmorate.repository.impl.JdbcUserRepository;
 
 import java.util.Collection;
@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.addFriend(user.getId(), friend.getId());
         eventService.createEvent(userId, friendId, UserEvent.EventType.FRIEND, UserEvent.EventOperation.ADD);
+        userRepository.getFriends(userId);
     }
 
     @Override
@@ -63,7 +64,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public User update(User newUser) {
-        if (userRepository.get(newUser.getId()).isEmpty()) throw new NotFoundException("Пользователь не бы найден");
+        if (userRepository.get(newUser.getId()).isEmpty()) throw new NotFoundException("Пользователь не был найден");
         return userRepository.update(newUser);
     }
 
@@ -76,7 +77,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private User getByIdOrThrow(Long id) {
-        return userRepository.get(id).orElseThrow(() -> new NotFoundException(" не найден Пользователь ID=" + id));
+        return userRepository.get(id).orElseThrow(() -> new NotFoundException("Не найден Пользователь ID=" + id));
     }
 
     public Collection<Film> getFilmRecommendations(Long userId) {

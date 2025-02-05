@@ -36,8 +36,8 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Review update(Review review) {
-        repository.getById(review.getReviewId()).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
-        eventService.createEvent(review.getUserId(), review.getReviewId(), UserEvent.EventType.REVIEW, UserEvent.EventOperation.UPDATE);
+        Review oldReview = repository.getById(review.getReviewId()).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
+        eventService.createEvent(oldReview.getUserId(), review.getReviewId(), UserEvent.EventType.REVIEW, UserEvent.EventOperation.UPDATE);
         return repository.update(review);
     }
 

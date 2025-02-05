@@ -3,12 +3,13 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.UserEvent;
 import ru.yandex.practicum.filmorate.repository.EventRepository;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 
 import java.time.Instant;
-import java.util.Collection;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,10 @@ public class BaseUserEventService implements EventService {
 
     @Override
     public Collection<UserEvent> getEventByUser(long userId) {
+        if (userRepository.get(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь не найден!");
+        }
+
         return eventRepository.getEventByUser(userId);
     }
 

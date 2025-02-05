@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.*;
@@ -11,7 +10,6 @@ import ru.yandex.practicum.filmorate.repository.impl.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BaseFilmService implements FilmService {
@@ -69,22 +67,22 @@ public class BaseFilmService implements FilmService {
     public void deleteLike(Long filmId, Long userId) {
         Film film = getFilmByIdOrThrow(filmId);
         User user = getUserByIdOrThrow(userId);
-        filmRepository.removeLike(film, user);
         eventService.createEvent(userId, filmId, UserEvent.EventType.LIKE, UserEvent.EventOperation.REMOVE);
+        filmRepository.removeLike(film, user);
     }
 
     public Collection<Film> getFilmsByDirector(Long directorId, String sortType) {
-        return filmRepository.findByDirector(directorId, sortType);
+        Collection<Film> films = filmRepository.findByDirector(directorId, sortType);
+        if (films.isEmpty()) {
+            throw new NotFoundException("Режиссер не найден!");
+        }
+        return films;
     }
 
     @Override
     public void delete(Long filmId) {
         getFilmByIdOrThrow(filmId);
         filmRepository.delete(filmId);
-    }
-
-    public List<Film> findBestLiked(Integer count) {
-        return filmRepository.findBestLiked(count);
     }
 
     public Film getFilmByIdOrThrow(Long filmId) {
@@ -125,16 +123,12 @@ public class BaseFilmService implements FilmService {
 
     @Override
     public List<Film> findMostPopularFilms(Integer count, Integer genreId, Integer year) {
-        log.info("Запрос популярных фильмов с фильтрацией: count={}, genreId={}, year={}", count, genreId, year);
-
         List<Film> films = filmRepository.findMostPopularFilms(count, genreId, year);
 
         if (!films.isEmpty()) {
             loadGenresForFilms(films);
             loadDirectorsForFilms(films);
         }
-
-        log.info("Фильмы после загрузки жанров и режиссёров: {}", films);
 
         return films;
     }
