@@ -129,7 +129,6 @@ public class BaseFilmService implements FilmService {
             loadGenresForFilms(films);
             loadDirectorsForFilms(films);
         }
-
         return films;
     }
 
