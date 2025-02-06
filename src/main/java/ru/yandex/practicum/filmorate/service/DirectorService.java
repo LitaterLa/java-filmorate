@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.repository.DirectorRepository;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -16,7 +16,7 @@ public class DirectorService {
 
     private final DirectorRepository directorRepository;
 
-    public Collection<Director> getAllDirectors() {
+    public List<Director> getAllDirectors() {
         return directorRepository.findAll();
     }
 

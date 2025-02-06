@@ -43,7 +43,7 @@ public class Film {
     @NotNull(groups = {Create.class, Update.class})
     @Positive(groups = {Create.class, Update.class})
     private int duration;
-    private LinkedHashSet<Genre> genres;
+    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
     @NotNull(groups = {Create.class, Update.class})
     private Mpaa mpa;
 

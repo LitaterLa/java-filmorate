@@ -2,13 +2,13 @@ package ru.yandex.practicum.filmorate.repository;
 
 import ru.yandex.practicum.filmorate.model.Director;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public interface DirectorRepository {
 
-    Collection<Director> findAll();
+    List<Director> findAll();
 
     Director findById(Long id);
 

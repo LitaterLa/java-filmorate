@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.UserEvent;
 import ru.yandex.practicum.filmorate.repository.impl.JdbcReviewRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -51,8 +50,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<Review> getReviewsByFilmId(Optional<Long> filmId, Integer count) {
-        filmId.ifPresent(filmService::getFilmByIdOrThrow);
+    public List<Review> getReviewsByFilmId(Long filmId, Integer count) {
+        filmService.getFilmByIdOrThrow(filmId);
         return repository.getReviewsByFilmId(filmId, count);
     }
 
