@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.model.Mpaa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.impl.JdbcFilmRepository;
 import ru.yandex.practicum.filmorate.repository.impl.JdbcUserRepository;
+import ru.yandex.practicum.filmorate.repository.mappers.DirectorRowMapper;
 import ru.yandex.practicum.filmorate.repository.mappers.FilmRowMapper;
 import ru.yandex.practicum.filmorate.repository.mappers.GenreRowMapper;
 import ru.yandex.practicum.filmorate.repository.mappers.MpaaRowMapper;
@@ -31,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({JdbcFilmRepository.class, FilmRowMapper.class, GenreRowMapper.class, UserRowMapper.class, MpaaRowMapper.class, JdbcUserRepository.class})
+@Import({JdbcFilmRepository.class, FilmRowMapper.class, GenreRowMapper.class, UserRowMapper.class, MpaaRowMapper.class, JdbcUserRepository.class, DirectorRowMapper.class})
 public class FilmDBRepositoryTest {
     private final JdbcFilmRepository filmRepository;
     private final JdbcUserRepository userRepository;

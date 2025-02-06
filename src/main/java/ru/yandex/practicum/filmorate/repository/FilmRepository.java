@@ -23,4 +23,10 @@ public interface FilmRepository {
     void removeLike(Film film, User user);
 
     List<Film> findBestLiked(Integer count);
+
+    List<Film> findCommonFilms(Long userId, Long friendId);
+
+    List<Film> findMostPopularFilms(Integer count, Integer genreId, Integer year);
+
+    Collection<Film> findByDirector(Long directorId, String sortType);
 }
