@@ -24,7 +24,7 @@ public class JdbcDirectorRepository implements DirectorRepository {
     private final DirectorRowMapper mapper;
 
     @Override
-    public Collection<Director> findAll() {
+    public List<Director> findAll() {
         String query = "SELECT id, name FROM DIRECTORS";
         return jdbc.query(query, mapper);
     }
@@ -33,7 +33,12 @@ public class JdbcDirectorRepository implements DirectorRepository {
     public Director findById(Long id) {
         String query = "SELECT id, name FROM DIRECTORS WHERE id = ?";
         try {
-            return jdbc.queryForObject(query, mapper, id);
+            List<Director> directors = jdbc.query(query, mapper, id);
+            if (directors.isEmpty()) {
+                return null;
+            } else {
+                return directors.get(0);
+            }
         } catch (EmptyResultDataAccessException ignored) {
             return null;
         }
