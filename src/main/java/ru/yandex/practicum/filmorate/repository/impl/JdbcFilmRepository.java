@@ -188,15 +188,11 @@ public class JdbcFilmRepository implements FilmRepository {
 
         jdbc.update(sqlQuery, params);
 
-        if (film.getGenres() != null) {
-            removeGenreFilm(film.getId());
-            addGenres(film.getId(), film.getGenres());
-        }
+        removeGenreFilm(film.getId());
+        addGenres(film.getId(), film.getGenres());
 
         removeDirectorFilm(film.getId());
         addDirectors(film.getId(), film.getDirectors());
-
-        film = get(film.getId()).orElseThrow();
 
         return film;
     }

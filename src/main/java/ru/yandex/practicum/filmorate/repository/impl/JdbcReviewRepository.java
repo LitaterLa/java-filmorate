@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.repository.ReviewRepository;
 import ru.yandex.practicum.filmorate.repository.mappers.ReviewRowMapper;
@@ -78,11 +79,12 @@ public class JdbcReviewRepository implements ReviewRepository {
         try {
             List<Review> reviews = jdbc.query(query, new MapSqlParameterSource().addValue("id", id), mapper);
             if (reviews.isEmpty()) {
-                return Optional.empty();
+                throw new NotFoundException("Отзыв не был найден");
             } else {
                 return Optional.of(reviews.get(0));
             }
-        } catch (EmptyResultDataAccessException e) {
+        } catch (
+                EmptyResultDataAccessException e) {
             return Optional.empty();
         }
     }
