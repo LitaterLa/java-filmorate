@@ -51,7 +51,6 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public List<Review> getReviewsByFilmId(Long filmId, Integer count) {
-        filmService.getFilmByIdOrThrow(filmId);
         return repository.getReviewsByFilmId(filmId, count);
     }
 
