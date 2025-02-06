@@ -69,7 +69,7 @@ create TABLE IF NOT EXISTS reviews (
      user_id        BIGINT     NOT NULL    REFERENCES users (id) ON delete CASCADE,
      film_id        BIGINT     NOT NULL    REFERENCES films (id) ON delete CASCADE,
      is_positive    BOOLEAN,
-     content        VARCHAR(1000)    NOT NULL,
+     content        VARCHAR(500)    NOT NULL,
      useful         INTEGER    DEFAULT 0
 );
 
