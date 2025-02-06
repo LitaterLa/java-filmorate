@@ -76,26 +76,31 @@ public class JdbcReviewRepository implements ReviewRepository {
         String query = "SELECT review_id, content, is_positive, user_id, film_id, useful " +
                 "FROM reviews WHERE review_id = :id";
         try {
-            Review review = jdbc.queryForObject(query, new MapSqlParameterSource().addValue("id", id), mapper);
-            return Optional.of(review);
+            List<Review> reviews = jdbc.query(query, new MapSqlParameterSource().addValue("id", id), mapper);
+            if (reviews.isEmpty()) {
+                return Optional.empty();
+            } else {
+                return Optional.of(reviews.get(0));
+            }
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
     }
 
     @Override
-    public List<Review> getReviewsByFilmId(Optional<Long> filmId, Integer count) {
+    public List<Review> getReviewsByFilmId(Long filmId, Integer count) {
         String query = "SELECT review_id, content, is_positive, user_id, film_id, useful " +
                 "FROM reviews " +
-                (filmId.isPresent() ? "WHERE film_id = :filmId " : "") +
+                (filmId != null ? "WHERE film_id = :filmId " : "") +
                 "ORDER BY USEFUL DESC " +
                 "LIMIT :count";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("count", count);
 
-        filmId.ifPresent(aLong -> params.addValue("filmId", aLong));
-
+        if (filmId != null) {
+            params.addValue("filmId", filmId);
+        }
         return jdbc.query(query, params, mapper);
     }
 

@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.integral_tests;
 
-/* import lombok.RequiredArgsConstructor;
+ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -65,7 +65,7 @@ public class UserDBRepositoryTest {
                 .isEqualTo(savedUser);
     }
 
-   /* @Test
+    @Test
     public void testGetAll() {
         userRepository.save(user);
         userRepository.save(user2);
@@ -139,4 +139,4 @@ public class UserDBRepositoryTest {
     }
 
 
-} */
+}

@@ -21,7 +21,6 @@ import ru.yandex.practicum.filmorate.validation.Create;
 import ru.yandex.practicum.filmorate.validation.Update;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/reviews")
@@ -60,19 +59,13 @@ public class ReviewController {
         return service.getById(id);
     }
 
-//    @GetMapping
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<Review> getAll() {
-//        return service.getAll();
-//    }
-
     @GetMapping
     public List<Review> getReviewsByFilm(
             @RequestParam(value = "filmId", required = false) Long filmId,
             @RequestParam(value = "count", defaultValue = "10") @Positive Integer count
     ) {
         log.info("получение отзывов по фильму {}", filmId);
-        return service.getReviewsByFilmId(Optional.ofNullable(filmId), count);
+        return service.getReviewsByFilmId(filmId, count);
     }
 
 

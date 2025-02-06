@@ -14,7 +14,7 @@ public interface ReviewRepository {
 
     Optional<Review> getById(Integer id);
 
-    List<Review> getReviewsByFilmId(Optional<Long> filmId, Integer count);
+    List<Review> getReviewsByFilmId(Long filmId, Integer count);
 
     void addLike(Integer reviewId, Long userId);
 
