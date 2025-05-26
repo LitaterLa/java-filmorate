@@ -3,18 +3,11 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.impl.JdbcFilmRepository;
-import ru.yandex.practicum.filmorate.repository.impl.JdbcGenreRepository;
-import ru.yandex.practicum.filmorate.repository.impl.JdbcMpaaRepository;
-import ru.yandex.practicum.filmorate.repository.impl.JdbcUserRepository;
+import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.repository.DirectorRepository;
+import ru.yandex.practicum.filmorate.repository.impl.*;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +17,9 @@ public class BaseFilmService implements FilmService {
     private final JdbcUserRepository userRepository;
     private final JdbcMpaaRepository mpaaRepository;
     private final JdbcGenreRepository genreRepository;
+    private final EventService eventService;
+    private final SearchRepositoryImpl searchRepository;
+    private final DirectorRepository directorRepository;
 
     public Film save(Film film) {
         mpaaRepository.getById(film.getMpa().getId())
@@ -64,25 +60,92 @@ public class BaseFilmService implements FilmService {
         Film film = getFilmByIdOrThrow(filmId);
         User user = getUserByIdOrThrow(userId);
         filmRepository.addLike(film, user);
+        eventService.createEvent(userId, filmId, UserEvent.EventType.LIKE, UserEvent.EventOperation.ADD);
     }
 
     @Override
     public void deleteLike(Long filmId, Long userId) {
         Film film = getFilmByIdOrThrow(filmId);
         User user = getUserByIdOrThrow(userId);
+        eventService.createEvent(userId, filmId, UserEvent.EventType.LIKE, UserEvent.EventOperation.REMOVE);
         filmRepository.removeLike(film, user);
     }
 
-    public List<Film> findBestLiked(Integer count) {
-        return filmRepository.findBestLiked(count);
+    public Collection<Film> getFilmsByDirector(Long directorId, String sortType) {
+        Collection<Film> films = filmRepository.findByDirector(directorId, sortType);
+        if (films.isEmpty()) {
+            throw new NotFoundException("Режиссер не найден!");
+        }
+        return films;
+    }
+
+    @Override
+    public void delete(Long filmId) {
+        getFilmByIdOrThrow(filmId);
+        filmRepository.delete(filmId);
     }
 
     public Film getFilmByIdOrThrow(Long filmId) {
         return filmRepository.get(filmId).orElseThrow(() -> new NotFoundException("not found film ID=" + filmId));
     }
 
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        userRepository.get(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден: userId=" + userId));
+        userRepository.get(friendId).orElseThrow(() -> new NotFoundException("Пользователь не найден: friendId=" + friendId));
+
+        return filmRepository.findCommonFilms(userId, friendId);
+    }
+
+    public List<Film> searchFilm(String query, String searchBy) {
+        return searchRepository.searchFilm(query, searchBy);
+    }
+
     private User getUserByIdOrThrow(Long userId) {
         return userRepository.get(userId).orElseThrow(() -> new NotFoundException("Not found user ID=" + userId));
     }
 
+    @Override
+    public void loadGenresForFilms(List<Film> films) {
+        if (films == null || films.isEmpty()) {
+            return;
+        }
+
+        Map<Long, Set<Genre>> genresByFilmId = genreRepository.getGenresByFilmIds(
+                films.stream()
+                        .map(Film::getId)
+                        .collect(Collectors.toSet())
+        );
+
+        for (Film film : films) {
+            film.setGenres(new LinkedHashSet<>(genresByFilmId.getOrDefault(film.getId(), new LinkedHashSet<>())));
+        }
+    }
+
+    @Override
+    public List<Film> findMostPopularFilms(Integer count, Integer genreId, Integer year) {
+        List<Film> films = filmRepository.findMostPopularFilms(count, genreId, year);
+
+        if (!films.isEmpty()) {
+            loadGenresForFilms(films);
+            loadDirectorsForFilms(films);
+        }
+
+        return films;
+    }
+
+    @Override
+    public void loadDirectorsForFilms(List<Film> films) {
+        if (films == null || films.isEmpty()) {
+            return;
+        }
+
+        Map<Long, Set<Director>> directorsByFilmId = directorRepository.getDirectorsByFilmIds(
+                films.stream().map(Film::getId).collect(Collectors.toSet())
+        );
+
+        for (Film film : films) {
+            film.setDirectors(new LinkedHashSet<>(directorsByFilmId.getOrDefault(film.getId(), new LinkedHashSet<>())));
+        }
+    }
 }
+

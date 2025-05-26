@@ -34,6 +34,5 @@ public class ErrorHandler {
         log.warn("Непредвиденная ошибка", e);
         return new ErrorResponse("Непредвиденная ошибка", e.getMessage());
     }
-
 }
 
